@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>نرس لينك — تمريض منزلي بضغطة كود</title>
-<meta name="description" content="نرس لينك: منصة تمريض منزلي. امسح كود QR، اختار الخدمة، حدد المدة والدفع، والممرض يوصلك لحد بيتك."/>
+<meta name="description" content="نرس لينك: منصة تمريض منزلي. امسح كود QR، سجل دخول بالوجه، اختار الخدمة، والممرض يوصلك لحد بيتك."/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
@@ -22,8 +22,7 @@
     <nav class="mainnav">
       <button class="navbtn active" data-view="home">الرئيسية</button>
       <button class="navbtn" data-view="patient">حجز خدمة</button>
-      <button class="navbtn" data-view="nurse">تطبيق الممرض</button>
-      <button class="navbtn" data-view="admin">لوحة الإدارة</button>
+      <button class="navbtn" data-view="admin">بوابة الإدارة</button>
     </nav>
   </div>
 </header>
@@ -38,11 +37,11 @@
           <div class="chiprow">
             <span class="hchip">🩺 تمريض منزلي</span>
             <span class="hchip">📍 مصر — كود QR</span>
-            <span class="hchip">⏱ ٣٠ و ٦٠ دقيقة</span>
-            <span class="hchip">🔒 حقن آمنة ومفحوصة</span>
+            <span class="hchip">🙂 دخول بالوجه</span>
+            <span class="hchip">🔐 بوابة محمية</span>
           </div>
           <h1>نرس لينك</h1>
-          <p class="sub">منصة تمريض منزلي: امسح الكود، اختار الخدمة اللي محتاجها، حدد المدة وطريقة الدفع — <b>والممرض يوصلك لحد بيتك.</b></p>
+          <p class="sub">امسح الكود، سجل دخولك بالوجه، اختار الخدمة اللي محتاجها — <b>والممرض يوصلك لحد بيتك.</b></p>
           <div class="hero-actions">
             <button class="btn btn-success btn-lg" onclick="showView('patient')">ابدأ الحجز الآن ←</button>
             <button class="btn btn-ghost btn-lg" onclick="scrollToServices()">شوف الخدمات</button>
@@ -60,26 +59,42 @@
       <section class="sec" id="home-services">
         <div class="sec-head">
           <h2>الخدمات المتاحة</h2>
-          <p class="muted">كروت كبيرة بأيقونات بسيطة — سهلة حتى لكبار السن. اضغط على أي خدمة لتبدأ الحجز فورًا.</p>
+          <p class="muted">كروت كبيرة بأيقونات بسيطة — سهلة حتى لكبار السن. اضغط على أي خدمة لتبدأ رحلة الحجز.</p>
         </div>
         <div class="svc-grid" id="home-services-grid"></div>
       </section>
 
       <section class="sec">
         <div class="sec-head">
-          <h2>رحلة المريض — ٩ خطوات</h2>
-          <p class="muted">الرحلة تبدأ من سكان الكود وبتتحرك خطوة بخطوة لحد الدفع، وبعدها الممرض يزور المريض ويتقيم.</p>
+          <h2>رحلة المريض — ١٠ خطوات</h2>
+          <p class="muted">من سكان الكود وتسجيل الدخول بالوجه، لحد ما الطلب يوصل الإدارة وتتوزع على ممرض في الشيفت حسب موقعك.</p>
         </div>
         <div class="jgrid">
-          <div class="jcard"><span class="jn">1</span><b>سكان الكود</b><span>ترحيب باسم العميل وتحديد الموقع</span></div>
-          <div class="jcard"><span class="jn">2</span><b>اختيار الخدمة</b><span>حقنة، جرح، كانيولا، محلول، رعاية</span></div>
-          <div class="jcard"><span class="jn">3</span><b>التفاصيل</b><span>نوع الحقن والدواء والمستلزمات</span></div>
-          <div class="jcard"><span class="jn">4</span><b>المدة</b><span>زيادة نصف ساعة بسعر ثابت</span></div>
-          <div class="jcard"><span class="jn">5</span><b>العنوان والموعد</b><span>المنطقة، التليفون، والوقت</span></div>
-          <div class="jcard"><span class="jn">6</span><b>المراجعة</b><span>السعر النهائي والخصم</span></div>
-          <div class="jcard hl"><span class="jn">7</span><b>الدفع</b><span>كاش، انستا باي، أونلاين</span></div>
-          <div class="jcard"><span class="jn">8</span><b>التتبع</b><span>قبول، في الطريق، وصل، خلصت</span></div>
-          <div class="jcard hl"><span class="jn">9</span><b>التقييم</b><span>نجوم وتعليق اختياري بعد الزيارة</span></div>
+          <div class="jcard"><span class="jn">1</span><b>سكان الكود</b><span>ترحيب وتحديد الموقع</span></div>
+          <div class="jcard hl"><span class="jn">2</span><b>تسجيل بالوجه</b><span>دخول ببيانات العميل وملفه</span></div>
+          <div class="jcard"><span class="jn">3</span><b>اختيار الخدمة</b><span>حقنة، جرح، كانيولا، محلول، رعاية</span></div>
+          <div class="jcard"><span class="jn">4</span><b>الأدوية والتفاصيل</b><span>الحقن المسموحة والممنوعة</span></div>
+          <div class="jcard"><span class="jn">5</span><b>المدة والإضافات</b><span>زيادة نصف ساعة بسعر ثابت</span></div>
+          <div class="jcard"><span class="jn">6</span><b>العنوان والملحوظة</b><span>تأكيد العنوان أو عنوان جديد</span></div>
+          <div class="jcard"><span class="jn">7</span><b>المراجعة</b><span>السعر النهائي والخصم</span></div>
+          <div class="jcard hl"><span class="jn">8</span><b>الدفع</b><span>كاش، انستا باي، أونلاين</span></div>
+          <div class="jcard"><span class="jn">9</span><b>تتبع الطلب</b><span>الإدارة توزع → الممرض ينفذ</span></div>
+          <div class="jcard"><span class="jn">10</span><b>التقييم</b><span>نجوم وتعليق اختياري</span></div>
+        </div>
+      </section>
+
+      <section class="sec">
+        <div class="sec-head">
+          <h2>🔐 الأمان والحماية</h2>
+          <p class="muted">حماية على أكتر من مستوى — للعميل وللمدير وللتمريض.</p>
+        </div>
+        <div class="swatches">
+          <span class="sw">🙂 دخول العميل بالمسح بالوجه</span>
+          <span class="sw">🔑 المدير والتمريض: يوزر وباسورد لكل حساب</span>
+          <span class="sw">🔒 قفل الدخول ٦٠ ثانية بعد ٥ محاولات خاطئة</span>
+          <span class="sw">⏱️ الجلسة بتقفل تلقائي بعد ٥ دقايق خمول</span>
+          <span class="sw">🧊 كلمات المرور متخزنة مشفّرة (hash + salt)</span>
+          <span class="sw">🛡️ الطلبات بتعدّي على الإدارة الأول</span>
         </div>
       </section>
 
@@ -93,14 +108,14 @@
           <li>كل ٣٠ دقيقة زيادة: <b>١٠٠ جنيه</b> (تجريبي).</li>
           <li>سعر الدواء اللي الممرض هيجيه: بيتضاف على الفاتورة بسعره.</li>
           <li>رسوم المواصلات: ممكن تتحدد حسب المنطقة (اختياري).</li>
-          <li>السعر الإجمالي (الخدمة + الدواء أو المطلوب + الوقت الإضافي) يظهر في شاشة المراجعة قبل الدفع.</li>
+          <li>السعر الإجمالي يظهر في شاشة المراجعة قبل الدفع.</li>
         </ul>
       </section>
 
       <section class="sec">
         <div class="sec-head">
           <h2>نظام خصم الولاء للمريض الدايم</h2>
-          <p class="muted">الخصم بيزيد ١٪ مع كل زيارة مكتملة، لحد ٥٪ — وبعد الزيارة الخامسة الدورة تصفر وتبدأ من جديد. بيحتسب أوتوماتيك في شاشة المراجعة.</p>
+          <p class="muted">الخصم بيزيد ١٪ مع كل زيارة مكتملة، لحد ٥٪ — وبعد الزيارة الخامسة الدورة تصفر. بيحتسب أوتوماتيك في المراجعة.</p>
         </div>
         <div class="loyal-strip">
           <div class="loyal-cell">الزيارة ١<b>بدون خصم</b></div>
@@ -140,7 +155,7 @@
       <section class="sec">
         <div class="sec-head">
           <h2>طرق الدفع</h2>
-          <p class="muted">٣ طرق دفع — العميل بيختار واحدة في آخر خطوة.</p>
+          <p class="muted">٣ طرق دفع — العميل بيختار واحدة قبل ما الطلب يروح للإدارة.</p>
         </div>
         <div class="pay-grid">
           <div class="pay-card"><b>💵 كاش</b><span class="muted">الممرض يستلم المبلغ عند الوصول ويوثق القيمة المطلوبة.</span></div>
@@ -166,45 +181,27 @@
     </div>
   </section>
 
-  <!-- ============ حجز خدمة (رحلة المريض) ============ -->
+  <!-- ============ حجز خدمة (رحلة العميل) ============ -->
   <section id="view-patient" class="view">
     <div class="container">
       <div class="sec-head left">
-        <h2>حجز خدمة — رحلة المريض</h2>
-        <p class="muted">٩ خطوات بسيطة من مسح الكود لحد التقييم — جرّبها بنفسك، كل حاجة محاكاة تفاعلية.</p>
+        <h2>حجز خدمة — رحلة العميل</h2>
+        <p class="muted">١٠ خطوات: امسح الكود → سجل دخولك بالوجه → اختار الخدمة والأدوية → أكّد عنوانك والملحوظة → ادفع → والطلب يروح للإدارة.</p>
       </div>
       <div id="wiz-steps" class="wiz-steps"></div>
       <div id="wiz-body" class="card wiz-body"></div>
     </div>
   </section>
 
-  <!-- ============ تطبيق الممرض ============ -->
-  <section id="view-nurse" class="view">
-    <div class="container">
-      <div class="sec-head left">
-        <h2>تطبيق الممرض</h2>
-        <p class="muted">حساب خاص لكل ممرض مربوط بمنطقة — بيستلم طلبات منطقته ويحدث حالة الطلب خطوة بخطوة.</p>
-      </div>
-      <div id="nurse-login" class="card center-card">
-        <h3 style="margin-top:0;color:var(--blue-dark)">تسجيل الدخول</h3>
-        <div class="field"><label>اختر حساب (تجريبي)</label><select id="n-who" class="inp"></select></div>
-        <div class="field"><label>رقم الموبايل</label><input id="n-phone" class="inp" type="tel" placeholder="01xxxxxxxxx"/></div>
-        <div class="field"><label>كود الدخول</label><input id="n-code" class="inp" type="password" placeholder="••••"/></div>
-        <button class="btn btn-primary btn-lg" style="width:100%;justify-content:center" onclick="nurseLogin()">دخول</button>
-        <p class="muted small" style="text-align:center;margin-bottom:0">أي رقم وكود بيشتغل — دي محاكاة.</p>
-      </div>
-      <div id="nurse-app" class="hidden"></div>
-    </div>
-  </section>
-
-  <!-- ============ لوحة الإدارة ============ -->
+  <!-- ============ بوابة الإدارة والتمريض ============ -->
   <section id="view-admin" class="view">
     <div class="container">
       <div class="sec-head left">
-        <h2>لوحة الإدارة</h2>
-        <p class="muted">كل الطلبات وحالتها، إدارة حسابات الممرضين ومناطقهم، الأسعار والخدمات والحقن المسموحة، والتقارير.</p>
+        <h2>بوابة الإدارة والتمريض</h2>
+        <p class="muted">دخول محمي بيوزر وكلمة مرور — اختار نوع الحساب: <b>المدير</b> (توزيع الزيارات ومراقبتها) أو <b>التمريض</b> (استلام وتنفيذ الزيارات). لكل حساب يوزر وباسورد خاص بيه.</p>
       </div>
-      <div id="admin-body"></div>
+      <div id="portal-login" class="hidden"></div>
+      <div id="portal-app" class="hidden"></div>
     </div>
   </section>
 
@@ -213,7 +210,7 @@
 <footer>
   <div class="container foot-inner">
     <div><b>نرس لينك</b> — نموذج أولي تفاعلي مبني على «وثيقة المفهوم». <span class="muted">الأرقام والأسعار تجريبية.</span></div>
-    <div class="muted">💡 في التطبيق الحقيقي: المسح بيكون بكاميرا QR والدفع بيتربط ببوابات فعلية.</div>
+    <div class="muted">💡 في التطبيق الحقيقي: المسح بالوجه والكود بيشتغلوا بكاميرا حقيقية والدفع بيتربط ببوابات فعلية.</div>
   </div>
 </footer>
 
