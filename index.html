@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>نرس لينك — تمريض منزلي بضغطة كود</title>
+<meta name="description" content="نرس لينك: منصة تمريض منزلي. امسح كود QR، اختار الخدمة، حدد المدة والدفع، والممرض يوصلك لحد بيتك."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="style.css"/>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='9' fill='%231565C0'/%3E%3Cpath d='M12 29V11l16 18V11' stroke='%23fff' stroke-width='4' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E"/>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="container topbar-inner">
+    <button class="brand" onclick="showView('home')" aria-label="نرس لينك">
+      <svg class="logo" viewBox="0 0 40 40"><rect width="40" height="40" rx="10" fill="#1565C0"/><path d="M12 29V11l16 18V11" stroke="#fff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/><circle cx="31.5" cy="9.5" r="4" fill="#43A047"/></svg>
+      <span class="brand-name">نرس لينك<small>NURSELINE</small></span>
+    </button>
+    <nav class="mainnav">
+      <button class="navbtn active" data-view="home">الرئيسية</button>
+      <button class="navbtn" data-view="patient">حجز خدمة</button>
+      <button class="navbtn" data-view="nurse">تطبيق الممرض</button>
+      <button class="navbtn" data-view="admin">لوحة الإدارة</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <!-- ============ الرئيسية ============ -->
+  <section id="view-home" class="view active">
+    <div class="hero">
+      <div class="container hero-inner">
+        <div>
+          <div class="chiprow">
+            <span class="hchip">🩺 تمريض منزلي</span>
+            <span class="hchip">📍 مصر — كود QR</span>
+            <span class="hchip">⏱ ٣٠ و ٦٠ دقيقة</span>
+            <span class="hchip">🔒 حقن آمنة ومفحوصة</span>
+          </div>
+          <h1>نرس لينك</h1>
+          <p class="sub">منصة تمريض منزلي: امسح الكود، اختار الخدمة اللي محتاجها، حدد المدة وطريقة الدفع — <b>والممرض يوصلك لحد بيتك.</b></p>
+          <div class="hero-actions">
+            <button class="btn btn-success btn-lg" onclick="showView('patient')">ابدأ الحجز الآن ←</button>
+            <button class="btn btn-ghost btn-lg" onclick="scrollToServices()">شوف الخدمات</button>
+          </div>
+        </div>
+        <div class="qr-card">
+          <div class="qr" id="qr-hero"></div>
+          <div class="qr-cap">امسح الكود → نرس لينك</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+
+      <section class="sec" id="home-services">
+        <div class="sec-head">
+          <h2>الخدمات المتاحة</h2>
+          <p class="muted">كروت كبيرة بأيقونات بسيطة — سهلة حتى لكبار السن. اضغط على أي خدمة لتبدأ الحجز فورًا.</p>
+        </div>
+        <div class="svc-grid" id="home-services-grid"></div>
+      </section>
+
+      <section class="sec">
+        <div class="sec-head">
+          <h2>رحلة المريض — ٩ خطوات</h2>
+          <p class="muted">الرحلة تبدأ من سكان الكود وبتتحرك خطوة بخطوة لحد الدفع، وبعدها الممرض يزور المريض ويتقيم.</p>
+        </div>
+        <div class="jgrid">
+          <div class="jcard"><span class="jn">1</span><b>سكان الكود</b><span>ترحيب باسم العميل وتحديد الموقع</span></div>
+          <div class="jcard"><span class="jn">2</span><b>اختيار الخدمة</b><span>حقنة، جرح، كانيولا، محلول، رعاية</span></div>
+          <div class="jcard"><span class="jn">3</span><b>التفاصيل</b><span>نوع الحقن والدواء والمستلزمات</span></div>
+          <div class="jcard"><span class="jn">4</span><b>المدة</b><span>زيادة نصف ساعة بسعر ثابت</span></div>
+          <div class="jcard"><span class="jn">5</span><b>العنوان والموعد</b><span>المنطقة، التليفون، والوقت</span></div>
+          <div class="jcard"><span class="jn">6</span><b>المراجعة</b><span>السعر النهائي والخصم</span></div>
+          <div class="jcard hl"><span class="jn">7</span><b>الدفع</b><span>كاش، انستا باي، أونلاين</span></div>
+          <div class="jcard"><span class="jn">8</span><b>التتبع</b><span>قبول، في الطريق، وصل، خلصت</span></div>
+          <div class="jcard hl"><span class="jn">9</span><b>التقييم</b><span>نجوم وتعليق اختياري بعد الزيارة</span></div>
+        </div>
+      </section>
+
+      <section class="sec" id="home-prices">
+        <div class="sec-head">
+          <h2>الأسعار المقترحة (أرقام تجريبية)</h2>
+          <p class="muted">كل خدمة ليها مدة أساسية محددة، والسعر الإضافي يظهر فورًا قبل الدفع.</p>
+        </div>
+        <div id="home-prices-body"></div>
+        <ul class="notes muted">
+          <li>كل ٣٠ دقيقة زيادة: <b>١٠٠ جنيه</b> (تجريبي).</li>
+          <li>سعر الدواء اللي الممرض هيجيه: بيتضاف على الفاتورة بسعره.</li>
+          <li>رسوم المواصلات: ممكن تتحدد حسب المنطقة (اختياري).</li>
+          <li>السعر الإجمالي (الخدمة + الدواء أو المطلوب + الوقت الإضافي) يظهر في شاشة المراجعة قبل الدفع.</li>
+        </ul>
+      </section>
+
+      <section class="sec">
+        <div class="sec-head">
+          <h2>نظام خصم الولاء للمريض الدايم</h2>
+          <p class="muted">الخصم بيزيد ١٪ مع كل زيارة مكتملة، لحد ٥٪ — وبعد الزيارة الخامسة الدورة تصفر وتبدأ من جديد. بيحتسب أوتوماتيك في شاشة المراجعة.</p>
+        </div>
+        <div class="loyal-strip">
+          <div class="loyal-cell">الزيارة ١<b>بدون خصم</b></div>
+          <div class="loyal-cell">الزيارة ٢<b>خصم ١٪</b></div>
+          <div class="loyal-cell">الزيارة ٣<b>خصم ٢٪</b></div>
+          <div class="loyal-cell">الزيارة ٤<b>خصم ٣٪</b></div>
+          <div class="loyal-cell max">الزيارة ٥<b>خصم ٥٪</b></div>
+        </div>
+      </section>
+
+      <section class="sec">
+        <div class="sec-head">
+          <h2>قواعد السلامة والحقن</h2>
+          <p class="muted">قائمة الحقن المسموحة ظاهرة دايمًا في الاختيار — والمنوعة بتترفض فورًا.</p>
+        </div>
+        <div class="safe-grid">
+          <div class="safe ok">
+            <h3>✔ الحقن المسموحة</h3>
+            <ul>
+              <li>فيتامينات (زي فيتامين B12 وفيتامين D)</li>
+              <li>ديكسا</li>
+              <li>أفيل</li>
+              <li>أي حقنة تانية بتتضاف بعد مراجعة من الإدارة</li>
+            </ul>
+          </div>
+          <div class="safe bad">
+            <h3>✖ الحقن المنوعة</h3>
+            <ul>
+              <li>كل المضادات الحيوية بكل أنواعها</li>
+              <li>أي حقنة مش في القائمة المسموحة</li>
+            </ul>
+            <div class="alert bad small">لو العميل كتب أو اختار مضاد حيوي — الرسالة بتظهر فورًا: «خدمة دي غير متاحة حالياً».</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="sec">
+        <div class="sec-head">
+          <h2>طرق الدفع</h2>
+          <p class="muted">٣ طرق دفع — العميل بيختار واحدة في آخر خطوة.</p>
+        </div>
+        <div class="pay-grid">
+          <div class="pay-card"><b>💵 كاش</b><span class="muted">الممرض يستلم المبلغ عند الوصول ويوثق القيمة المطلوبة.</span></div>
+          <div class="pay-card"><b>📱 انستا باي</b><span class="muted">يظهرلك رقم أو عنوان الدفع، وتحوّل وتطلب إثبات التحويل بصورة.</span></div>
+          <div class="pay-card"><b>💳 دفع أونلاين</b><span class="muted">دفع مباشر داخل الموقع قبل الزيارة.</span></div>
+        </div>
+      </section>
+
+      <section class="sec">
+        <div class="sec-head">
+          <h2>الاسم والهوية</h2>
+          <p class="muted">«نرس لينك» بيصل بين الممرض والمريض — وده بيتناسب مع فكرة سكان الكود. اللوجو: حرف N بعلامة طبية.</p>
+        </div>
+        <div class="swatches">
+          <span class="sw"><i style="background:#1565C0"></i> أزرق طبي — العناوين والهيدر</span>
+          <span class="sw"><i style="background:#2E7D32"></i> أخضر مفتوح — أزرار التأكيد</span>
+          <span class="sw"><i style="background:#fff;box-shadow:inset 0 0 0 1px #ccc"></i> أبيض — الخلفية والإحساس بالنظافة</span>
+          <span class="sw"><i style="background:#C62828"></i> أحمر هادي — للتنبيهات فقط</span>
+        </div>
+        <p class="muted small" style="margin-top:12px">أسماء بديلة مقترحة: نرس هوم · بلس هوم · لمسة · في بيتك</p>
+      </section>
+
+    </div>
+  </section>
+
+  <!-- ============ حجز خدمة (رحلة المريض) ============ -->
+  <section id="view-patient" class="view">
+    <div class="container">
+      <div class="sec-head left">
+        <h2>حجز خدمة — رحلة المريض</h2>
+        <p class="muted">٩ خطوات بسيطة من مسح الكود لحد التقييم — جرّبها بنفسك، كل حاجة محاكاة تفاعلية.</p>
+      </div>
+      <div id="wiz-steps" class="wiz-steps"></div>
+      <div id="wiz-body" class="card wiz-body"></div>
+    </div>
+  </section>
+
+  <!-- ============ تطبيق الممرض ============ -->
+  <section id="view-nurse" class="view">
+    <div class="container">
+      <div class="sec-head left">
+        <h2>تطبيق الممرض</h2>
+        <p class="muted">حساب خاص لكل ممرض مربوط بمنطقة — بيستلم طلبات منطقته ويحدث حالة الطلب خطوة بخطوة.</p>
+      </div>
+      <div id="nurse-login" class="card center-card">
+        <h3 style="margin-top:0;color:var(--blue-dark)">تسجيل الدخول</h3>
+        <div class="field"><label>اختر حساب (تجريبي)</label><select id="n-who" class="inp"></select></div>
+        <div class="field"><label>رقم الموبايل</label><input id="n-phone" class="inp" type="tel" placeholder="01xxxxxxxxx"/></div>
+        <div class="field"><label>كود الدخول</label><input id="n-code" class="inp" type="password" placeholder="••••"/></div>
+        <button class="btn btn-primary btn-lg" style="width:100%;justify-content:center" onclick="nurseLogin()">دخول</button>
+        <p class="muted small" style="text-align:center;margin-bottom:0">أي رقم وكود بيشتغل — دي محاكاة.</p>
+      </div>
+      <div id="nurse-app" class="hidden"></div>
+    </div>
+  </section>
+
+  <!-- ============ لوحة الإدارة ============ -->
+  <section id="view-admin" class="view">
+    <div class="container">
+      <div class="sec-head left">
+        <h2>لوحة الإدارة</h2>
+        <p class="muted">كل الطلبات وحالتها، إدارة حسابات الممرضين ومناطقهم، الأسعار والخدمات والحقن المسموحة، والتقارير.</p>
+      </div>
+      <div id="admin-body"></div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="container foot-inner">
+    <div><b>نرس لينك</b> — نموذج أولي تفاعلي مبني على «وثيقة المفهوم». <span class="muted">الأرقام والأسعار تجريبية.</span></div>
+    <div class="muted">💡 في التطبيق الحقيقي: المسح بيكون بكاميرا QR والدفع بيتربط ببوابات فعلية.</div>
+  </div>
+</footer>
+
+<div id="toast" class="toast"></div>
+<script src="app.js"></script>
+</body>
+</html>
