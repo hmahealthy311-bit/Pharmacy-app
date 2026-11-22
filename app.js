@@ -566,7 +566,7 @@ function simulateRequest(req){
   });
 }
 
-/* ---------- الخطوة ٩: التقييم ---------- */n
+/* ---------- الخطوة ٩: التقييم ---------- */
 function step9(){
   var r=findReq(booking.reqId)||{};
   var stars=[1,2,3,4,5].map(function(n){
@@ -690,7 +690,7 @@ function renderAdmin(){
   var avg=state.ratings.length?(state.ratings.reduce(function(a,b){ return a+b.stars; },0)/state.ratings.length).toFixed(1):'—';
   var rows=state.requests.map(function(r){
     var s=SERVICE_BY[r.service]||{name:r.service};
-    return '<tr>'+​
+    return '<tr>'+
       '<td>#'+r.id+((r.overdue&&r.status==='new')?' <span class="badge late">متأخر</span>':'')+'</td>'+
       '<td>'+esc(r.patient)+'</td>'+
       '<td>'+esc(r.region)+'</td>'+
