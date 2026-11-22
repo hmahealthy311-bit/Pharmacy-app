@@ -221,11 +221,15 @@ function detailValid(){
   if(!booking.service) return false;
   if(booking.service==='injection'){
     if(!booking.choice) return false;
+    if(booking.choice==='bring' && booking.itemIdx<0) return false;
     if(booking.choice==='self'){
       if(isAntibiotic(booking.selfName)) return false;
       if(booking.selfName.trim().length<2) return false;
     }
-  } else if(!booking.choice){ booking.choice='none'; }
+  } else {
+    if(!booking.choice) booking.choice='none';
+    if(booking.choice==='bring' && state.items[booking.service] && state.items[booking.service].length && booking.itemIdx<0) return false;
+  }
   return true;
 }
 function paymentValid(){
