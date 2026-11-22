@@ -10,7 +10,7 @@ function $(s, r){ return (r||document).querySelector(s); }
 function $$(s, r){ return Array.prototype.slice.call((r||document).querySelectorAll(s)); }
 function esc(v){
   return String(v==null?'':v).replace(/[&<>"']/g, function(c){
-    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
   });
 }
 var toastTimer=null;
@@ -40,7 +40,7 @@ var I={
   user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/>'
 };
 function icon(name, cls){
-  return '<svg class="ic '+(cls||'')+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+(I[name]||'')+'</svg>';
+  return '<svg class="ic ' + (cls||'') + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + (I[name]||'') + '</svg>';
 }
 
 /* ---------- الخدمات ---------- */
@@ -242,7 +242,8 @@ function refreshAll(){
 
 /* ---------- كود QR تجريبي ---------- */
 function drawQR(el){
-  var size=21, h='';
+  var size=21;
+  var cells=[];
   for(var r=0;r<size;r++){
     for(var c=0;c<size;c++){
       var dark=false;
@@ -254,11 +255,11 @@ function drawQR(el){
       } else {
         dark=(((r*31+c*17+r*c*3)%7)<3);
       }
-      h+='<span class="'+(dark?'qd':'')+'"></span>';
+      cells.push('<span class="'+(dark?'qd':'')+'"></span>');
     }
   }
   el.style.gridTemplateColumns='repeat('+size+',1fr)';
-  el.innerHTML=h;
+  el.innerHTML=cells.join('');
 }
 
 /* =========================================================
@@ -272,9 +273,7 @@ var ORDER=['new','assigned','accepted','onway','arrived','done'];
 var NEXT={accepted:'onway',onway:'arrived',arrived:'done'};
 
 function freshBooking(){
-  return {step:1,scanned:false,faceState:'idle',customer:null,service:null,choice:null,itemIdx:-1,selfName:'',rx:false,extra:0,
-    addressIdx:null,newAddr:null,note:'',region:'',address:'',date:'',time:'',transport:false,
-    payment:null,proof:false,paid:false,reqId:null,stars:0,comment:''};
+  return {step:1,scanned:false,faceState:'idle',customer:null,service:null,choice:null,itemIdx:-1,selfName:'',rx:false,extra:0,addressIdx:null,newAddr:null,note:'',region:'',address:'',date:'',time:'',transport:false,payment:null,proof:false,paid:false,reqId:null,stars:0,comment:''};
 }
 var booking=freshBooking();
 
@@ -396,44 +395,50 @@ function renderStep(){
 
 /* ---------- الخطوة ١: سكان الكود ---------- */
 function step1(){
-  return '<div class="step-title">'+icon('qr')+' الخطوة ١ — سكان الكود</div>'+
-  '<p class="muted">العميل يمسح كود QR من كارت، أو إعلان، أو ستيكر — فيفتح الموقع ويظهر ترحيب باسم المنصة.</p>'+
-  '<div class="scan-wrap">'+
-    '<div class="qr-card"><div class="qr" id="qrbox"></div><div class="qr-cap">كود QR — نرس لينك</div></div>'+
-    '<div>'+(booking.scanned ?
-      '<div class="loc-found">'+icon('pin')+' تم تحديد موقعك التقريبي: <b>القاهرة، مصر</b></div>'+
-      '<div class="welcome-big">أهلاً بيك في <b>نرس لينك</b> 👋</div>'+
-      '<p>الخطوة الجاية: تسجيل الدخول بالوجه عشان نفتح ملفك وتقدر تحجز.</p>'+
-      '<button class="btn btn-success btn-lg" onclick="nextStep()">تسجيل الدخول بالوجه ←</button>'
-      :
-      '<button class="btn btn-primary btn-lg" onclick="scanCode()">📱 امسح الكود (محاكاة)</button>'+
-      '<p class="muted small">دي محاكاة لخطوة المسح — في التطبيق الحقيقي الكاميرا بتفتح تلقائي.</p>'
-    )+'</div>'+
-  '</div>';
+  if(booking.scanned){
+    return `<div class="step-title">${icon('qr')} الخطوة ١ — سكان الكود</div>
+    <div class="scan-wrap">
+      <div class="qr-card"><div class="qr" id="qrbox"></div><div class="qr-cap">كود QR — نرس لينك</div></div>
+      <div>
+        <div class="loc-found">${icon('pin')} تم تحديد موقعك التقريبي: <b>القاهرة، مصر</b></div>
+        <div class="welcome-big">أهلاً بيك في <b>نرس لينك</b> 👋</div>
+        <p>الخطوة الجاية: تسجيل الدخول بالوجه عشان نفتح ملفك وتقدر تحجز.</p>
+        <button class="btn btn-success btn-lg" onclick="nextStep()">تسجيل الدخول بالوجه ←</button>
+      </div>
+    </div>`;
+  }
+  return `<div class="step-title">${icon('qr')} الخطوة ١ — سكان الكود</div>
+  <p class="muted">العميل يمسح كود QR من كارت، أو إعلان، أو ستيكر — فيفتح الموقع ويظهر ترحيب باسم المنصة.</p>
+  <div class="scan-wrap">
+    <div class="qr-card"><div class="qr" id="qrbox"></div><div class="qr-cap">كود QR — نرس لينك</div></div>
+    <div>
+      <button class="btn btn-primary btn-lg" onclick="scanCode()">📱 امسح الكود (محاكاة)</button>
+      <p class="muted small">دي محاكاة لخطوة المسح — في التطبيق الحقيقي الكاميرا بتفتح تلقائي.</p>
+    </div>
+  </div>`;
 }
 function scanCode(){ booking.scanned=true; renderStep(); toast('تم مسح الكود بنجاح ✔','ok'); }
 
 /* ---------- الخطوة ٢: تسجيل الدخول بالوجه ---------- */
 function step2(){
   var st=booking.faceState||'idle';
-  var body='';
   if(st!=='done'){
-    body='<div class="face-scan '+st+'">'+
-      '<div class="face-ring">'+icon('user','face-ic')+'<div class="face-line"></div></div>'+
-      '<div class="face-status">'+(st==='scanning'?'⏳ جاري تحليل الوجه…':'حط وشك قدام الكاميرا وامسح')+'</div>'+
-    '</div>'+
-    '<button class="btn btn-primary btn-lg" '+(st==='scanning'?'disabled':'')+' onclick="scanFace()">'+(st==='scanning'?'جاري المسح…':'🙂 امسح بوجهك (محاكاة)')+'</button>'+
-    '<p class="muted small">المسح بالوجه بيعمل تسجيل دخول ببياناتك — وبيفتح ملف فيه عناوينك المحفوظة.</p>';
-  } else {
-    var cName=(booking.customer&&booking.customer.name)?esc(booking.customer.name):'';
-    var cPhone=(booking.customer&&booking.customer.phone)?esc(booking.customer.phone):'';
-    body='<div class="loc-found">'+icon('check')+' تم التحقق من الوجه ✔ — كمّل بياناتك</div>'+
-    '<div class="field"><label>الاسم</label><input id="fc-name" class="inp" placeholder="اسمك بالكامل" value="'+cName+'"></div>'+
-    '<div class="field"><label>رقم الموبايل</label><input id="fc-phone" class="inp" type="tel" placeholder="01xxxxxxxxx" value="'+cPhone+'"></div>'+
-    '<button class="btn btn-success btn-lg" onclick="faceContinue()">متابعة ←</button>'+
-    '<p class="muted small">لو أول مرة: هنفتحلك ملف عميل جديد. لو كنت مسجل قبل كده: هنكتشف حسابك من رقم موبايلك وعناوينك هتظهر تلقائي.</p>';
+    return `<div class="step-title">الخطوة ٢ — تسجيل الدخول بالوجه</div>
+    <div class="face-scan ${st}">
+      <div class="face-ring">${icon('user','face-ic')}<div class="face-line"></div></div>
+      <div class="face-status">${st==='scanning'?'⏳ جاري تحليل الوجه…':'حط وشك قدام الكاميرا وامسح'}</div>
+    </div>
+    <button class="btn btn-primary btn-lg" ${st==='scanning'?'disabled':''} onclick="scanFace()">${st==='scanning'?'جاري المسح…':'🙂 امسح بوجهك (محاكاة)'}</button>
+    <p class="muted small">المسح بالوجه بيعمل تسجيل دخول ببياناتك — وبيفتح ملف فيه عناوينك المحفوظة.</p>`;
   }
-  return '<div class="step-title">الخطوة ٢ — تسجيل الدخول بالوجه</div>'+body;
+  var cName=(booking.customer&&booking.customer.name)?esc(booking.customer.name):'';
+  var cPhone=(booking.customer&&booking.customer.phone)?esc(booking.customer.phone):'';
+  return `<div class="step-title">الخطوة ٢ — تسجيل الدخول بالوجه</div>
+  <div class="loc-found">${icon('check')} تم التحقق من الوجه ✔ — كمّل بياناتك</div>
+  <div class="field"><label>الاسم</label><input id="fc-name" class="inp" placeholder="اسمك بالكامل" value="${cName}"></div>
+  <div class="field"><label>رقم الموبايل</label><input id="fc-phone" class="inp" type="tel" placeholder="01xxxxxxxxx" value="${cPhone}"></div>
+  <button class="btn btn-success btn-lg" onclick="faceContinue()">متابعة ←</button>
+  <p class="muted small">لو أول مرة: هنفتحلك ملف عميل جديد. لو كنت مسجل قبل كده: هنكتشف حسابك من رقم موبايلك وعناوينك هتظهر تلقائي.</p>`;
 }
 function scanFace(){
   if(booking.faceState!=='idle') return;
@@ -477,17 +482,17 @@ function faceContinue(){
 function step3(){
   var cards=SERVICES.map(function(s){
     var c=state.prices[s.id];
-    return '<button class="svc-card '+(booking.service===s.id?'sel':'')+'" onclick="pickService(\''+s.id+'\')">'+
-      icon(s.icon,'svc-ic')+
-      '<b>'+s.name+'</b>'+
-      '<span class="muted small">'+s.desc+'</span>'+
-      '<span class="svc-meta">'+icon('clock')+' '+c.dur+' دقيقة · '+c.price+' ج</span>'+
-    '</button>';
+    return `<button class="svc-card ${booking.service===s.id?'sel':''}" onclick="pickService('${s.id}')">
+      ${icon(s.icon,'svc-ic')}
+      <b>${s.name}</b>
+      <span class="muted small">${s.desc}</span>
+      <span class="svc-meta">${icon('clock')} ${c.dur} دقيقة · ${c.price} ج</span>
+    </button>`;
   }).join('');
-  return '<div class="step-title">'+icon('check')+' الخطوة ٣ — اختيار الخدمة</div>'+
-  '<p class="muted">أهلاً <b>'+esc(booking.customer?booking.customer.name:'')+'</b> — كروت كبيرة بأيقونات واضحة لسهولة الاستخدام حتى لكبار السن.</p>'+
-  '<div class="svc-grid">'+cards+'</div>'+
-  '<div class="wiz-actions"><button class="btn btn-ghost" onclick="prevStep()">→ السابق</button><button class="btn btn-primary" onclick="nextStep()">التالي ←</button></div>';
+  return `<div class="step-title">${icon('check')} الخطوة ٣ — اختيار الخدمة</div>
+  <p class="muted">أهلاً <b>${esc(booking.customer?booking.customer.name:'')}</b> — كروت كبيرة بأيقونات واضحة لسهولة الاستخدام حتى لكبار السن.</p>
+  <div class="svc-grid">${cards}</div>
+  <div class="wiz-actions"><button class="btn btn-ghost" onclick="prevStep()">→ السابق</button><button class="btn btn-primary" onclick="nextStep()">التالي ←</button></div>`;
 }
 function pickService(id){
   booking.service=id; booking.choice=null; booking.itemIdx=-1;
@@ -500,46 +505,57 @@ function step4(){
   var s=SERVICE_BY[booking.service];
   var inner='';
   if(s.id==='injection'){
-    inner=
-      '<div class="rule-box ok">'+icon('shield')+' الحقن المسموحة على المنصة (عضلة فقط): '+state.allowed.map(esc).join('، ')+'.</div>'+
-      '<div class="rule-box bad">'+icon('alert')+' الحقن المضادة الحيوية بكل أنواعها <b>ممنوعة</b> على المنصة.</div>'+
-      '<label class="opt '+(booking.choice==='none'?'sel':'')+'"><input type="radio" name="ch" '+(booking.choice==='none'?'checked':'')+' onchange="setChoice(\'none\')"><span>مش محتاج دواء — الدواء موجود عندي</span></label>'+
-      '<label class="opt '+(booking.choice==='bring'?'sel':'')+'"><input type="radio" name="ch" '+(booking.choice==='bring'?'checked':'')+' onchange="setChoice(\'bring\')"><span>الممرض يجيب معاه الدواء (سعره بيتضاف على الفاتورة)</span></label>'+
-      (booking.choice==='bring' ? '<div class="med-list">'+state.items.injection.map(function(m,i){
-          return '<label class="opt small '+(booking.itemIdx===i?'sel':'')+'"><input type="radio" name="med" '+(booking.itemIdx===i?'checked':'')+' onchange="setItemIdx('+i+')"><span>'+esc(m.n)+' <b class="price-tag">+'+m.p+' ج</b></span></label>';
-        }).join('')+'</div>' : '')+
-      '<label class="opt '+(booking.choice==='self'?'sel':'')+'"><input type="radio" name="ch" '+(booking.choice==='self'?'checked':'')+' onchange="setChoice(\'self\')"><span>هجيب الدواء بنفسي (مطلوب روشتة من الدكتور)</span></label>'+
-      (booking.choice==='self' ?
-        '<div class="self-box">'+
-          '<input class="inp" type="text" placeholder="اكتب اسم الدواء اللي معاك…" value="'+esc(booking.selfName)+'" oninput="selfChanged(this)">'+
-          '<label class="file-btn">'+(booking.rx?'✔ روشتة مرفقة':'📎 ارفق صورة الروشتة')+'<input type="file" accept="image/*" hidden onchange="rxPicked(this)"></label>'+
-          '<div id="self-alerts">'+selfAlerts()+'</div>'+
-          '<p class="muted small">أي حقنة مش في القائمة بتتم مراجعتها من الإدارة قبل التنفيذ — واسم الدواء اللي الإدارة تقرره هو المعتمد.</p>'+
-        '</div>' : '');
+    var medList='';
+    if(booking.choice==='bring'){
+      medList='<div class="med-list">'+state.items.injection.map(function(m,i){
+        return `<label class="opt small ${booking.itemIdx===i?'sel':''}"><input type="radio" name="med" ${booking.itemIdx===i?'checked':''} onchange="setItemIdx(${i})"><span>${esc(m.n)} <b class="price-tag">+${m.p} ج</b></span></label>`;
+      }).join('')+'</div>';
+    }
+    var selfBox='';
+    if(booking.choice==='self'){
+      selfBox=`<div class="self-box">
+        <input class="inp" type="text" placeholder="اكتب اسم الدواء اللي معاك…" value="${esc(booking.selfName)}" oninput="selfChanged(this)">
+        <label class="file-btn">${booking.rx?'✔ روشتة مرفقة':'📎 ارفق صورة الروشتة'}<input type="file" accept="image/*" hidden onchange="rxPicked(this)"></label>
+        <div id="self-alerts">${selfAlerts()}</div>
+        <p class="muted small">أي حقنة مش في القائمة بتتم مراجعتها من الإدارة قبل التنفيذ — واسم الدواء اللي الإدارة تقرره هو المعتمد.</p>
+      </div>`;
+    }
+    inner=`<div class="rule-box ok">${icon('shield')} الحقن المسموحة على المنصة (عضلة فقط): ${state.allowed.map(esc).join('، ')}.</div>
+    <div class="rule-box bad">${icon('alert')} الحقن المضادة الحيوية بكل أنواعها <b>ممنوعة</b> على المنصة.</div>
+    <label class="opt ${booking.choice==='none'?'sel':''}"><input type="radio" name="ch" ${booking.choice==='none'?'checked':''} onchange="setChoice('none')"><span>مش محتاج دواء — الدواء موجود عندي</span></label>
+    <label class="opt ${booking.choice==='bring'?'sel':''}"><input type="radio" name="ch" ${booking.choice==='bring'?'checked':''} onchange="setChoice('bring')"><span>الممرض يجيب معاه الدواء (سعره بيتضاف على الفاتورة)</span></label>
+    ${medList}
+    <label class="opt ${booking.choice==='self'?'sel':''}"><input type="radio" name="ch" ${booking.choice==='self'?'checked':''} onchange="setChoice('self')"><span>هجيب الدواء بنفسي (مطلوب روشتة من الدكتور)</span></label>
+    ${selfBox}`;
   } else if(state.items[s.id] && state.items[s.id].length){
-    inner=
-      '<label class="opt '+(booking.choice==='bring'?'sel':'')+'"><input type="radio" name="ch" '+(booking.choice==='bring'?'checked':'')+' onchange="setChoice(\'bring\')"><span>الممرض يجيب معاه المستلزمات (بتتضاف على الفاتورة)</span></label>'+
-      (booking.choice==='bring' ? '<div class="med-list">'+state.items[s.id].map(function(m,i){
-          return '<label class="opt small '+(booking.itemIdx===i?'sel':'')+'"><input type="radio" name="med" '+(booking.itemIdx===i?'checked':'')+' onchange="setItemIdx('+i+')"><span>'+esc(m.n)+' <b class="price-tag">+'+m.p+' ج</b></span></label>';
-        }).join('')+'</div>' : '')+
-      '<label class="opt '+(booking.choice==='none'?'sel':'')+'"><input type="radio" name="ch" '+(booking.choice==='none'?'checked':'')+' onchange="setChoice(\'none\')"><span>المستلزمات موجودة عندي</span></label>';
+    var supList='';
+    if(booking.choice==='bring'){
+      supList='<div class="med-list">'+state.items[s.id].map(function(m,i){
+        return `<label class="opt small ${booking.itemIdx===i?'sel':''}"><input type="radio" name="med" ${booking.itemIdx===i?'checked':''} onchange="setItemIdx(${i})"><span>${esc(m.n)} <b class="price-tag">+${m.p} ج</b></span></label>`;
+      }).join('')+'</div>';
+    }
+    inner=`<label class="opt ${booking.choice==='bring'?'sel':''}"><input type="radio" name="ch" ${booking.choice==='bring'?'checked':''} onchange="setChoice('bring')"><span>الممرض يجيب معاه المستلزمات (بتتضاف على الفاتورة)</span></label>
+    ${supList}
+    <label class="opt ${booking.choice==='none'?'sel':''}"><input type="radio" name="ch" ${booking.choice==='none'?'checked':''} onchange="setChoice('none')"><span>المستلزمات موجودة عندي</span></label>`;
   } else {
     if(!booking.choice) booking.choice='none';
-    inner='<div class="rule-box ok">'+icon('shield')+' رعاية المريض بتتحدد بالساعات — هتحدد المدة في الخطوة الجاية، وتقدر تكتب ملحوظة للممرض في خطوة العنوان.</div>';
+    inner=`<div class="rule-box ok">${icon('shield')} رعاية المريض بتتحدد بالساعات — هتحدد المدة في الخطوة الجاية، وتقدر تكتب ملحوظة للممرض في خطوة العنوان.</div>`;
   }
-  return '<div class="step-title">'+icon('alert')+' الخطوة ٤ — الأدوية والتفاصيل</div>'+
-  '<p class="muted">الخدمة المختارة: <b>'+s.name+'</b></p>'+inner+
-  '<div class="wiz-actions"><button class="btn btn-ghost" onclick="prevStep()">→ السابق</button><button class="btn btn-primary" '+(detailValid()?'':'disabled')+' onclick="nextStep()">التالي ←</button></div>';
+  return `<div class="step-title">${icon('alert')} الخطوة ٤ — الأدوية والتفاصيل</div>
+  <p class="muted">الخدمة المختارة: <b>${s.name}</b></p>
+  ${inner}
+  <div class="wiz-actions"><button class="btn btn-ghost" onclick="prevStep()">→ السابق</button><button class="btn btn-primary" ${detailValid()?'':'disabled'} onclick="nextStep()">التالي ←</button></div>`;
 }
 function setChoice(v){ booking.choice=v; if(v!=='bring') booking.itemIdx=-1; renderStep(); }
 function setItemIdx(i){ booking.itemIdx=i; renderStep(); }
 function selfAlerts(){
-  var t=booking.selfName.trim(), h='';
+  var t=booking.selfName.trim();
+  var h='';
   if(t.length>=2){
     if(isAntibiotic(t)){
-      h+='<div class="alert bad">'+icon('alert')+' <b>خدمة دي غير متاحة حالياً</b> — الحقن المضادة الحيوية مش متاحة عبر نرس لينك. لو دكتورك وصفلك حقنة مضاد حيوي، نفّذها بره المنصة أو استشير الدكتور في بديل.</div>';
+      h=`<div class="alert bad">${icon('alert')} <b>خدمة دي غير متاحة حالياً</b> — الحقن المضادة الحيوية مش متاحة عبر نرس لينك. لو دكتورك وصفلك حقنة مضاد حيوي، نفّذها بره المنصة أو استشير الدكتور في بديل.</div>`;
     } else if(state.allowed.indexOf(t)===-1){
-      h+='<div class="alert warn">'+icon('alert')+' الحقنة دي مش في القائمة المسموحة — هتحتاج مراجعة من الإدارة قبل التنفيذ.</div>';
+      h=`<div class="alert warn">${icon('alert')} الحقنة دي مش في القائمة المسموحة — هتحتاج مراجعة من الإدارة قبل التنفيذ.</div>`;
     }
   }
   return h;
@@ -562,19 +578,19 @@ function step5(){
   var cfg=state.prices[s.id];
   var unit=(s.id==='care')?'ساعة':'نصف ساعة';
   var c=calc();
-  return '<div class="step-title">'+icon('clock')+' الخطوة ٥ — المدة والإضافات</div>'+
-  '<p class="muted">المدة الأساسية لـ<b>'+s.name+'</b>: <b>'+cfg.dur+' دقيقة</b> — وكل إضافة ثابتة السعر وبتظهر فورًا.</p>'+
-  '<div class="dur-box">'+
-    '<div>المدة الأساسية: <b>'+cfg.dur+' د</b> · السعر: <b>'+cfg.price+' ج</b></div>'+
-    '<div class="stepper">'+
-      '<button class="btn btn-ghost" onclick="addExtra(-1)">−</button>'+
-      '<div class="dur-val">+ '+booking.extra+' '+unit+'</div>'+
-      '<button class="btn btn-success" onclick="addExtra(1)">+</button>'+
-    '</div>'+
-    '<div class="muted small">كل '+unit+' إضافية: <b>+'+cfg.extra+' ج</b></div>'+
-    '<div class="price-live">السعر الحالي: <b>'+(c.base+c.extraCost+c.items)+' ج</b></div>'+
-  '</div>'+
-  '<div class="wiz-actions"><button class="btn btn-ghost" onclick="prevStep()">→ السابق</button><button class="btn btn-primary" onclick="nextStep()">التالي ←</button></div>';
+  return `<div class="step-title">${icon('clock')} الخطوة ٥ — المدة والإضافات</div>
+  <p class="muted">المدة الأساسية لـ<b>${s.name}</b>: <b>${cfg.dur} دقيقة</b> — وكل إضافة ثابتة السعر وبتظهر فورًا.</p>
+  <div class="dur-box">
+    <div>المدة الأساسية: <b>${cfg.dur} د</b> · السعر: <b>${cfg.price} ج</b></div>
+    <div class="stepper">
+      <button class="btn btn-ghost" onclick="addExtra(-1)">−</button>
+      <div class="dur-val">+ ${booking.extra} ${unit}</div>
+      <button class="btn btn-success" onclick="addExtra(1)">+</button>
+    </div>
+    <div class="muted small">كل ${unit} إضافية: <b>+${cfg.extra} ج</b></div>
+    <div class="price-live">السعر الحالي: <b>${c.base+c.extraCost+c.items} ج</b></div>
+  </div>
+  <div class="wiz-actions"><button class="btn btn-ghost" onclick="prevStep()">→ السابق</button><button class="btn btn-primary" onclick="nextStep()">التالي ←</button></div>`;
 }
 function addExtra(d){ booking.extra=Math.max(0, booking.extra+d); renderStep(); }
 
@@ -584,26 +600,35 @@ function step6(){
   var list='';
   if(cu.addresses && cu.addresses.length){
     list='<div class="addr-list">'+cu.addresses.map(function(a,i){
-      return '<label class="opt '+(booking.addressIdx===i?'sel':'')+'"><input type="radio" name="addr" '+(booking.addressIdx===i?'checked':'')+' onchange="pickAddr('+i+')"><span>'+icon('pin')+' <b>'+esc(a.region)+'</b> — '+esc(a.text)+'</span></label>';
+      return `<label class="opt ${booking.addressIdx===i?'sel':''}"><input type="radio" name="addr" ${booking.addressIdx===i?'checked':''} onchange="pickAddr(${i})"><span>${icon('pin')} <b>${esc(a.region)}</b> — ${esc(a.text)}</span></label>`;
     }).join('')+'</div>';
   } else {
     list='<p class="muted">لسه مفيش عناوين محفوظة في ملفك — ضيف عنوان جديد.</p>';
   }
-  var selInfo=(booking.addressIdx!=null && cu.addresses && cu.addresses[booking.addressIdx])?'<div class="loc-found">'+icon('check')+' العنوان المختار: <b>'+esc(cu.addresses[booking.addressIdx].region)+'</b> — '+esc(cu.addresses[booking.addressIdx].text)+'</div>':'';
-  var addForm=booking.newAddr?(
-    '<div class="self-box">'+
-      '<div class="field"><label>المنطقة</label><select class="inp" onchange="booking.newAddr.region=this.value"><option value="">اختار المنطقة…</option>'+Object.keys(state.fees).map(function(r){return '<option '+(booking.newAddr.region===r?'selected':'')+'>'+r+'</option>';}).join('')+'</select></div>'+
-      '<div class="field"><label>العنوان بالتفصيل</label><textarea class="inp" rows="2" placeholder="المبنى، الدور، علامة مميزة…" oninput="booking.newAddr.text=this.value">'+esc(booking.newAddr.text||'')+'</textarea></div>'+
-      '<button class="btn btn-success" onclick="saveNewAddr()">💾 احفظ العنوان في ملفي</button>'+
-    '</div>'
-  ):'<button class="btn btn-ghost" onclick="showNewAddr()">➕ استخدم عنوان جديد</button>';
-  return '<div class="step-title">'+icon('pin')+' الخطوة ٦ — تأكيد العنوان والملحوظة</div>'+
-  '<div class="nurse-mini">'+icon('user')+' '+esc(cu.name||'')+' · '+icon('phone')+' '+esc(cu.phone||'')+'</div>'+
-  '<h3 class="sec-t">عناوينك المحفوظة — أكّد العنوان أو اختار عنوان تاني</h3>'+list+selInfo+addForm+
-  '<div class="field"><label>📝 ملحوظة للممرض (اختياري)</label><textarea class="inp" rows="2" placeholder="أي تفاصيل مهمة: الدور، الباب مفتوح، فيه مريض ساكت…" oninput="booking.note=this.value">'+esc(booking.note||'')+'</textarea></div>'+
-  '<div class="field"><label>الموعد</label><div class="grid2"><input class="inp" type="date" value="'+esc(booking.date)+'" onchange="booking.date=this.value"><input class="inp" type="time" value="'+esc(booking.time)+'" onchange="booking.time=this.value"></div></div>'+
-  '<div class="field"><label class="chk"><input type="checkbox" '+(booking.transport?'checked':'')+' onchange="booking.transport=this.checked; renderStep()"> أضف رسوم مواصلات الممرض (اختياري)</label>'+(booking.transport&&booking.region?'<div class="muted small">رسوم المنطقة: <b>'+state.fees[booking.region]+' ج</b></div>':'')+'</div>'+
-  '<div class="wiz-actions"><button class="btn btn-ghost" onclick="prevStep()">→ السابق</button><button class="btn btn-primary" onclick="nextStep()">المراجعة ←</button></div>';
+  var selInfo=(booking.addressIdx!=null && cu.addresses && cu.addresses[booking.addressIdx])?`<div class="loc-found">${icon('check')} العنوان المختار: <b>${esc(cu.addresses[booking.addressIdx].region)}</b> — ${esc(cu.addresses[booking.addressIdx].text)}</div>`:'';
+  var addForm;
+  if(booking.newAddr){
+    var regionOpts=Object.keys(state.fees).map(function(r){
+      return `<option ${booking.newAddr.region===r?'selected':''}>${r}</option>`;
+    }).join('');
+    addForm=`<div class="self-box">
+      <div class="field"><label>المنطقة</label><select class="inp" onchange="booking.newAddr.region=this.value"><option value="">اختار المنطقة…</option>${regionOpts}</select></div>
+      <div class="field"><label>العنوان بالتفصيل</label><textarea class="inp" rows="2" placeholder="المبنى، الدور، علامة مميزة…" oninput="booking.newAddr.text=this.value">${esc(booking.newAddr.text||'')}</textarea></div>
+      <button class="btn btn-success" onclick="saveNewAddr()">💾 احفظ العنوان في ملفي</button>
+    </div>`;
+  } else {
+    addForm='<button class="btn btn-ghost" onclick="showNewAddr()">➕ استخدم عنوان جديد</button>';
+  }
+  return `<div class="step-title">${icon('pin')} الخطوة ٦ — تأكيد العنوان والملحوظة</div>
+  <div class="nurse-mini">${icon('user')} ${esc(cu.name||'')} · ${icon('phone')} ${esc(cu.phone||'')}</div>
+  <h3 class="sec-t">عناوينك المحفوظة — أكّد العنوان أو اختار عنوان تاني</h3>
+  ${list}
+  ${selInfo}
+  ${addForm}
+  <div class="field"><label>📝 ملحوظة للممرض (اختياري)</label><textarea class="inp" rows="2" placeholder="أي تفاصيل مهمة: الدور، الباب مفتوح، فيه مريض ساكت…" oninput="booking.note=this.value">${esc(booking.note||'')}</textarea></div>
+  <div class="field"><label>الموعد</label><div class="grid2"><input class="inp" type="date" value="${esc(booking.date)}" onchange="booking.date=this.value"><input class="inp" type="time" value="${esc(booking.time)}" onchange="booking.time=this.value"></div></div>
+  <div class="field"><label class="chk"><input type="checkbox" ${booking.transport?'checked':''} onchange="booking.transport=this.checked; renderStep()"> أضف رسوم مواصلات الممرض (اختياري)</label>${booking.transport&&booking.region?`<div class="muted small">رسوم المنطقة: <b>${state.fees[booking.region]} ج</b></div>`:''}</div>
+  <div class="wiz-actions"><button class="btn btn-ghost" onclick="prevStep()">→ السابق</button><button class="btn btn-primary" onclick="nextStep()">المراجعة ←</button></div>`;
 }
 function pickAddr(i){
   booking.addressIdx=i;
@@ -633,28 +658,28 @@ function step7(){
   var c=calc();
   var unitTxt=(s.id==='care')?(booking.extra+' ساعة إضافية'):(booking.extra+' × ٣٠ دقيقة إضافية');
   var disc=discPercent();
-  return '<div class="step-title">الخطوة ٧ — مراجعة الطلب</div>'+
-  '<div class="review">'+
-    '<div class="rev-row"><span>العميل</span><b>'+esc(booking.customer.name)+' · '+esc(booking.customer.phone)+'</b></div>'+
-    '<div class="rev-row"><span>الخدمة</span><b>'+s.name+'</b></div>'+
-    '<div class="rev-row"><span>التفاصيل</span><b>'+esc(detailText())+'</b></div>'+
-    '<div class="rev-row"><span>المدة</span><b>'+cfg.dur+' د'+(booking.extra?' + '+unitTxt:'')+'</b></div>'+
-    '<div class="rev-row"><span>المنطقة</span><b>'+esc(booking.region)+'</b></div>'+
-    '<div class="rev-row"><span>العنوان</span><b>'+esc(booking.address)+'</b></div>'+
-    '<div class="rev-row"><span>ملحوظة</span><b>'+esc(booking.note||'—')+'</b></div>'+
-    '<div class="rev-row"><span>الموعد</span><b>'+esc(booking.date||'—')+' · '+esc(booking.time||'—')+'</b></div>'+
-    '<div class="rev-row"><span>المواصلات</span><b>'+(booking.transport?(state.fees[booking.region]+' ج'):'بدون')+'</b></div>'+
-  '</div>'+
-  '<div class="price-box">'+
-    '<div class="pr-row"><span>الخدمة الأساسية</span><span>'+c.base+' ج</span></div>'+
-    '<div class="pr-row"><span>وقت إضافي</span><span>'+c.extraCost+' ج</span></div>'+
-    '<div class="pr-row"><span>دواء / مستلزمات</span><span>'+c.items+' ج</span></div>'+
-    '<div class="pr-row"><span>مواصلات</span><span>'+c.transport+' ج</span></div>'+
-    '<div class="pr-row disc"><span>خصم الولاء ('+disc+'%)</span><span>−'+c.discAmt+' ج</span></div>'+
-    '<div class="pr-row total"><span>الإجمالي</span><span>'+c.total+' ج</span></div>'+
-  '</div>'+
-  '<div class="loyalty">'+icon('star')+' دي الزيارة رقم <b>'+cycleVisit()+'</b> من ٥ في دورة الخصم — خصم الولاء الحالي: <b>'+disc+'%</b> <span class="small">(الخصم بيزيد ١٪ مع كل زيارة مكتملة، الخامسة ٥٪ وبعدها الدورة تصفر)</span></div>'+
-  '<div class="wiz-actions"><button class="btn btn-ghost" onclick="prevStep()">→ السابق</button><button class="btn btn-success" onclick="nextStep()">اعتماد والانتقال للدفع ←</button></div>';
+  return `<div class="step-title">الخطوة ٧ — مراجعة الطلب</div>
+  <div class="review">
+    <div class="rev-row"><span>العميل</span><b>${esc(booking.customer.name)} · ${esc(booking.customer.phone)}</b></div>
+    <div class="rev-row"><span>الخدمة</span><b>${s.name}</b></div>
+    <div class="rev-row"><span>التفاصيل</span><b>${esc(detailText())}</b></div>
+    <div class="rev-row"><span>المدة</span><b>${cfg.dur} د${booking.extra?' + '+unitTxt:''}</b></div>
+    <div class="rev-row"><span>المنطقة</span><b>${esc(booking.region)}</b></div>
+    <div class="rev-row"><span>العنوان</span><b>${esc(booking.address)}</b></div>
+    <div class="rev-row"><span>ملحوظة</span><b>${esc(booking.note||'—')}</b></div>
+    <div class="rev-row"><span>الموعد</span><b>${esc(booking.date||'—')} · ${esc(booking.time||'—')}</b></div>
+    <div class="rev-row"><span>المواصلات</span><b>${booking.transport?(state.fees[booking.region]+' ج'):'بدون'}</b></div>
+  </div>
+  <div class="price-box">
+    <div class="pr-row"><span>الخدمة الأساسية</span><span>${c.base} ج</span></div>
+    <div class="pr-row"><span>وقت إضافي</span><span>${c.extraCost} ج</span></div>
+    <div class="pr-row"><span>دواء / مستلزمات</span><span>${c.items} ج</span></div>
+    <div class="pr-row"><span>مواصلات</span><span>${c.transport} ج</span></div>
+    <div class="pr-row disc"><span>خصم الولاء (${disc}%)</span><span>−${c.discAmt} ج</span></div>
+    <div class="pr-row total"><span>الإجمالي</span><span>${c.total} ج</span></div>
+  </div>
+  <div class="loyalty">${icon('star')} دي الزيارة رقم <b>${cycleVisit()}</b> من ٥ في دورة الخصم — خصم الولاء الحالي: <b>${disc}%</b> <span class="small">(الخصم بيزيد ١٪ مع كل زيارة مكتملة، الخامسة ٥٪ وبعدها الدورة تصفر)</span></div>
+  <div class="wiz-actions"><button class="btn btn-ghost" onclick="prevStep()">→ السابق</button><button class="btn btn-success" onclick="nextStep()">اعتماد والانتقال للدفع ←</button></div>`;
 }
 
 /* ---------- الخطوة ٨: الدفع ---------- */
@@ -666,22 +691,23 @@ function step8(){
     ['online','دفع أونلاين من الموقع','دفع مباشر داخل الموقع قبل الزيارة.','shield']
   ];
   var cards=methods.map(function(m){
-    return '<button class="pay-card '+(pay===m[0]?'sel':'')+'" onclick="pickPayment(\''+m[0]+'\')">'+icon(m[3])+'<b>'+m[1]+'</b><span class="muted small">'+m[2]+'</span></button>';
+    return `<button class="pay-card ${pay===m[0]?'sel':''}" onclick="pickPayment('${m[0]}')">${icon(m[3])}<b>${m[1]}</b><span class="muted small">${m[2]}</span></button>`;
   }).join('');
   var panel='';
   if(pay==='insta'){
-    panel='<div class="insta-box"><div>'+icon('phone')+' رقم انستا باي: <b class="mono">0100 000 0000</b> — عنوان الدفع: <b class="mono">nurseline@instapay</b></div><label class="chk"><input type="checkbox" '+(booking.proof?'checked':'')+' onchange="booking.proof=this.checked; syncPayBtn()"> بعت صورة إثبات التحويل ✔</label></div>';
+    panel=`<div class="insta-box"><div>${icon('phone')} رقم انستا باي: <b class="mono">0100 000 0000</b> — عنوان الدفع: <b class="mono">nurseline@instapay</b></div><label class="chk"><input type="checkbox" ${booking.proof?'checked':''} onchange="booking.proof=this.checked; syncPayBtn()"> بعت صورة إثبات التحويل ✔</label></div>`;
   } else if(pay==='online'){
     panel=booking.paid
       ? '<div class="insta-box"><div class="alert ok" style="margin:0">تم الدفع أونلاين بنجاح ✔</div></div>'
-      : '<div class="insta-box"><button class="btn btn-primary" onclick="payOnline()">💳 ادفع الآن ('+calc().total+' ج) — محاكاة</button></div>';
+      : `<div class="insta-box"><button class="btn btn-primary" onclick="payOnline()">💳 ادفع الآن (${calc().total} ج) — محاكاة</button></div>`;
   } else if(pay==='cash'){
-    panel='<div class="insta-box">المبلغ المطلوب عند الوصول: <b>'+calc().total+' ج</b> — الممرض هيوثق الاستلام.</div>';
+    panel=`<div class="insta-box">المبلغ المطلوب عند الوصول: <b>${calc().total} ج</b> — الممرض هيوثق الاستلام.</div>`;
   }
-  return '<div class="step-title">الخطوة ٨ — طريقة الدفع</div>'+
-  '<p class="muted">٣ طرق دفع — بعد التأكيد الطلب يروح مباشرة للإدارة للتوزيع.</p>'+
-  '<div class="pay-grid">'+cards+'</div>'+panel+
-  '<div class="wiz-actions"><button class="btn btn-ghost" onclick="prevStep()">→ السابق</button><button id="wiz-confirm" class="btn btn-success" '+(paymentValid()?'':'disabled')+' onclick="confirmOrder()">تأكيد الطلب وإرساله للإدارة ✔</button></div>';
+  return `<div class="step-title">الخطوة ٨ — طريقة الدفع</div>
+  <p class="muted">٣ طرق دفع — بعد التأكيد الطلب يروح مباشرة للإدارة للتوزيع.</p>
+  <div class="pay-grid">${cards}</div>
+  ${panel}
+  <div class="wiz-actions"><button class="btn btn-ghost" onclick="prevStep()">→ السابق</button><button id="wiz-confirm" class="btn btn-success" ${paymentValid()?'':'disabled'} onclick="confirmOrder()">تأكيد الطلب وإرساله للإدارة ✔</button></div>`;
 }
 function pickPayment(m){ booking.payment=m; renderStep(); }
 function payOnline(){ booking.paid=true; renderStep(); toast('تم الدفع (محاكاة) ✔','ok'); }
@@ -723,14 +749,14 @@ function step9(){
   for(var i=0;i<stages.length;i++){ if(stages[i][0]===r.status) idx=i; }
   var tl=stages.map(function(st,i){
     var cls=((idx>=0 && i<=idx)?'on':'')+(r.status===st[0]?' now':'');
-    return '<div class="tl '+cls+'"><div class="tl-dot">'+(i<idx?icon('check'):'')+'</div><div><b>'+st[1]+'</b><span class="muted">'+st[2]+'</span></div></div>';
+    return `<div class="tl ${cls}"><div class="tl-dot">${i<idx?icon('check'):''}</div><div><b>${st[1]}</b><span class="muted">${st[2]}</span></div></div>`;
   }).join('');
-  return '<div class="step-title">الخطوة ٩ — تتبع الطلب</div>'+
-  '<p class="muted">الطلب بيروح الأول للإدارة، وهي اللي بتوزعه على ممرض موجود في الشيفت حسب الموقع.</p>'+
-  (r.status==='new'?'<div class="alert warn">'+icon('clock')+' الطلب وصل لوحة الإدارة 🔒 — في انتظار التوزيع على ممرض في الشيفت حسب موقعك…</div>':'')+
-  (r.nurse?'<div class="nurse-mini">'+icon('user')+' الممرض/ة: <b>'+esc(r.nurse)+'</b> · '+icon('phone')+' '+esc(nursePhone(r.nurse))+'</div>':'')+
-  '<div class="timeline">'+tl+'</div>'+
-  '<div class="wiz-actions"><button class="btn btn-ghost" onclick="prevStep()">→ السابق</button><button class="btn btn-ghost" onclick="boost()">⏩ تسريع المحاكاة</button><button class="btn btn-primary" '+(r.status==='done'?'':'disabled')+' onclick="nextStep()">التقييم ←</button></div>';
+  return `<div class="step-title">الخطوة ٩ — تتبع الطلب</div>
+  <p class="muted">الطلب بيروح الأول للإدارة، وهي اللي بتوزعه على ممرض موجود في الشيفت حسب الموقع.</p>
+  ${r.status==='new'?`<div class="alert warn">${icon('clock')} الطلب وصل لوحة الإدارة 🔒 — في انتظار التوزيع على ممرض في الشيفت حسب موقعك…</div>`:''}
+  ${r.nurse?`<div class="nurse-mini">${icon('user')} الممرض/ة: <b>${esc(r.nurse)}</b> · ${icon('phone')} ${esc(nursePhone(r.nurse))}</div>`:''}
+  <div class="timeline">${tl}</div>
+  <div class="wiz-actions"><button class="btn btn-ghost" onclick="prevStep()">→ السابق</button><button class="btn btn-ghost" onclick="boost()">⏩ تسريع المحاكاة</button><button class="btn btn-primary" ${r.status==='done'?'':'disabled'} onclick="nextStep()">التقييم ←</button></div>`;
 }
 function nursePhone(name){
   for(var i=0;i<state.nurses.length;i++){ if(state.nurses[i].name===name) return state.nurses[i].phone||'—'; }
@@ -768,21 +794,20 @@ function simulateRequest(req){
 function step10(){
   var r=findReq(booking.reqId)||{};
   var stars=[1,2,3,4,5].map(function(n){
-    return '<button class="starbtn '+(booking.stars>=n?'on':'')+'" onclick="setStars('+n+')">★</button>';
+    return `<button class="starbtn ${booking.stars>=n?'on':''}" onclick="setStars(${n})">★</button>`;
   }).join('');
-  return '<div class="step-title">الخطوة ١٠ — تقييم الممرض</div>'+
-  '<p class="muted">قيم الممرض من ١ لـ ٥ نجوم — اختياري مع تعليق، وبيوصل للإدارة مباشرة.</p>'+
-  (r.nurse?'<div class="nurse-mini">'+icon('user')+' بتقيّم: <b>'+esc(r.nurse)+'</b></div>':'')+
-  '<div class="stars">'+stars+'</div>'+
-  '<div class="field"><label>تعليق (اختياري)</label><textarea class="inp" rows="2" placeholder="رأيك في الخدمة…" oninput="booking.comment=this.value">'+esc(booking.comment)+'</textarea></div>'+
-  '<div class="wiz-actions"><button class="btn btn-ghost" onclick="prevStep()">→ السابق</button><button class="btn btn-success" '+(booking.stars>0?'':'disabled')+' onclick="submitRating()">إرسال التقييم ✔</button></div>';
+  return `<div class="step-title">الخطوة ١٠ — تقييم الممرض</div>
+  <p class="muted">قيم الممرض من ١ لـ ٥ نجوم — اختياري مع تعليق، وبيوصل للإدارة مباشرة.</p>
+  ${r.nurse?`<div class="nurse-mini">${icon('user')} بتقيّم: <b>${esc(r.nurse)}</b></div>`:''}
+  <div class="stars">${stars}</div>
+  <div class="field"><label>تعليق (اختياري)</label><textarea class="inp" rows="2" placeholder="رأيك في الخدمة…" oninput="booking.comment=this.value">${esc(booking.comment)}</textarea></div>
+  <div class="wiz-actions"><button class="btn btn-ghost" onclick="prevStep()">→ السابق</button><button class="btn btn-success" ${booking.stars>0?'':'disabled'} onclick="submitRating()">إرسال التقييم ✔</button></div>`;
 }
 function setStars(n){ booking.stars=n; renderStep(); }
 function submitRating(){
   var r=findReq(booking.reqId); if(!r) return;
-  var cmt=booking.comment||'';
   r.rated=booking.stars;
-  state.ratings.unshift({nurse:r.nurse,stars:booking.stars,comment:cmt,when:new Date().toISOString().slice(0,10)});
+  state.ratings.unshift({nurse:r.nurse,stars:booking.stars,comment:booking.comment||'',when:new Date().toISOString().slice(0,10)});
   var nurse=null;
   if(r.nurseId!=null) nurse=findNurse(r.nurseId);
   if(!nurse){
@@ -797,14 +822,13 @@ function submitRating(){
   state.completedVisits++;
   save();
   var pos=cyclePos();
-  $('#wiz-body').innerHTML=
-    '<div class="thanks">'+
-      '<div class="thanks-ic">✅</div>'+
-      '<h3>شكراً ليك!</h3>'+
-      '<p>تقييمك وصل للإدارة وهيساعد نحسّن الخدمة.</p>'+
-      '<div class="loyalty big">'+icon('star')+' الزيارات المكتملة في دورتك الحالية: <b>'+pos+'/5</b> — خصمك في الزيارة الجاية: <b>'+DISC[pos]+'%</b></div>'+
-      '<button class="btn btn-primary btn-lg" onclick="newOrder()">اطلب زيارة جديدة</button>'+
-    '</div>';
+  $('#wiz-body').innerHTML=`<div class="thanks">
+    <div class="thanks-ic">✅</div>
+    <h3>شكراً ليك!</h3>
+    <p>تقييمك وصل للإدارة وهيساعد نحسّن الخدمة.</p>
+    <div class="loyalty big">${icon('star')} الزيارات المكتملة في دورتك الحالية: <b>${pos}/5</b> — خصمك في الزيارة الجاية: <b>${DISC[pos]}%</b></div>
+    <button class="btn btn-primary btn-lg" onclick="newOrder()">اطلب زيارة جديدة</button>
+  </div>`;
   toast('شكراً لتقييمك 🌟','ok');
 }
 function newOrder(){ booking=freshBooking(); renderWizard(); }
@@ -827,29 +851,29 @@ function renderPortal(){
 }
 function portalLoginHTML(){
   var locked=isLocked();
-  var lockHtml=locked?'<div class="alert bad">'+icon('alert')+' الدخول مقفول مؤقتًا 🔒 — جرّب تاني بعد <b>'+lockRemaining()+'</b> ثانية.</div>':'';
-  var attempts=(state.lock && state.lock.attempts)?'<p class="muted small">محاولات خاطئة: '+state.lock.attempts+' من ٥</p>':'';
-  return lockHtml+
-  '<div class="portal-split">'+
-    '<div class="card portal-card">'+
-      '<div class="portal-role">'+icon('shield')+' دخول المدير</div>'+​
-      '<p class="muted small">صلاحيات كاملة: توزيع الزيارات حسب الموقع، إدارة الشيفت، حسابات الممرضين، الأسعار، والتقارير.</p>'+​
-      '<div class="field"><label>اسم المستخدم</label><input id="lu-a-user" class="inp" autocomplete="username" placeholder="admin"></div>'+​
-      '<div class="field"><label>كلمة المرور</label><div class="pw-row"><input id="lu-a-pass" class="inp" type="password" autocomplete="current-password" placeholder="••••••••"><button type="button" class="eye" onclick="togglePw(\'lu-a-pass\',this)">👁</button></div></div>'+​
-      '<button class="btn btn-primary btn-lg" '+(locked?'disabled':'')+' onclick="portalLogin(\'admin\',\'lu-a-user\',\'lu-a-pass\')">دخول المدير ←</button>'+​
-      '<div class="demo-creds">بيانات تجريبية: يوزر <b class="mono">admin</b> — باسورد <b class="mono">Admin@123</b></div>'+​
-    '</div>'+​
-    '<div class="card portal-card">'+​
-      '<div class="portal-role">'+icon('user')+' دخول التمريض</div>'+​
-      '<p class="muted small">حساب الممرض اللي هيستلم الزيارة: بيستلم الطلبات المُسندة ليه من الإدارة ويحدّث حالتها، ويقدر يغير اسمه وباسورده.</p>'+​
-      '<div class="field"><label>اسم المستخدم</label><input id="lu-n-user" class="inp" autocomplete="username" placeholder="sara"></div>'+​
-      '<div class="field"><label>كلمة المرور</label><div class="pw-row"><input id="lu-n-pass" class="inp" type="password" autocomplete="current-password" placeholder="••••••••"><button type="button" class="eye" onclick="togglePw(\'lu-n-pass\',this)">👁</button></div></div>'+​
-      '<button class="btn btn-success btn-lg" '+(locked?'disabled':'')+' onclick="portalLogin(\'nurse\',\'lu-n-user\',\'lu-n-pass\')">دخول التمريض ←</button>'+​
-      '<div class="demo-creds">تجريبي: <b class="mono">sara / Sara@123</b> أو <b class="mono">mona / Mona@123</b></div>'+​
-    '</div>'+​
-  '</div>'+​
-  attempts+​
-  '<div class="alert ok">'+icon('shield')+' <b>حماية البيانات:</b> كلمات المرور مش متخزنة نص صريح (hash + salt) · قفل تلقائي للدخول بعد ٥ محاولات غلط · الجلسة بتقفل تلقائيًا بعد ٥ دقايق خمول · الطلبات بتعدّي على الإدارة الأول قبل الممرض.</div>';
+  var lockHtml=locked?`<div class="alert bad">${icon('alert')} الدخول مقفول مؤقتًا 🔒 — جرّب تاني بعد <b>${lockRemaining()}</b> ثانية.</div>`:'';
+  var attempts=(state.lock && state.lock.attempts)?`<p class="muted small">محاولات خاطئة: ${state.lock.attempts} من ٥</p>`:'';
+  return `${lockHtml}
+  <div class="portal-split">
+    <div class="card portal-card">
+      <div class="portal-role">${icon('shield')} دخول المدير</div>
+      <p class="muted small">صلاحيات كاملة: توزيع الزيارات حسب الموقع، إدارة الشيفت، حسابات الممرضين، الأسعار، والتقارير.</p>
+      <div class="field"><label>اسم المستخدم</label><input id="lu-a-user" class="inp" autocomplete="username" placeholder="admin"></div>
+      <div class="field"><label>كلمة المرور</label><div class="pw-row"><input id="lu-a-pass" class="inp" type="password" autocomplete="current-password" placeholder="••••••••"><button type="button" class="eye" onclick="togglePw('lu-a-pass',this)">👁</button></div></div>
+      <button class="btn btn-primary btn-lg" ${locked?'disabled':''} onclick="portalLogin('admin','lu-a-user','lu-a-pass')">دخول المدير ←</button>
+      <div class="demo-creds">بيانات تجريبية: يوزر <b class="mono">admin</b> — باسورد <b class="mono">Admin@123</b></div>
+    </div>
+    <div class="card portal-card">
+      <div class="portal-role">${icon('user')} دخول التمريض</div>
+      <p class="muted small">حساب الممرض اللي هيستلم الزيارة: بيستلم الطلبات المُسندة ليه من الإدارة ويحدّث حالتها، ويقدر يغير اسمه وباسورده.</p>
+      <div class="field"><label>اسم المستخدم</label><input id="lu-n-user" class="inp" autocomplete="username" placeholder="sara"></div>
+      <div class="field"><label>كلمة المرور</label><div class="pw-row"><input id="lu-n-pass" class="inp" type="password" autocomplete="current-password" placeholder="••••••••"><button type="button" class="eye" onclick="togglePw('lu-n-pass',this)">👁</button></div></div>
+      <button class="btn btn-success btn-lg" ${locked?'disabled':''} onclick="portalLogin('nurse','lu-n-user','lu-n-pass')">دخول التمريض ←</button>
+      <div class="demo-creds">تجريبي: <b class="mono">sara / Sara@123</b> أو <b class="mono">mona / Mona@123</b></div>
+    </div>
+  </div>
+  ${attempts}
+  <div class="alert ok">${icon('shield')} <b>حماية البيانات:</b> كلمات المرور مش متخزنة نص صريح (hash + salt) · قفل تلقائي للدخول بعد ٥ محاولات غلط · الجلسة بتقفل تلقائيًا بعد ٥ دقايق خمول · الطلبات بتعدّي على الإدارة الأول قبل الممرض.</div>`;
 }
 function togglePw(id, btn){
   var inp=$('#'+id); if(!inp) return;
@@ -886,21 +910,24 @@ function portalLogin(role, userIn, passIn){
 function renderManager(){
   var app=$('#portal-app');
   var tabs=[['dash','📊 لوحة التحكم'],['visits','🩺 الزيارات'],['shift','🕐 الشيفت'],['settings','⚙️ الإعدادات']];
-  var head='<div class="nurse-head admin-head">'+
-      '<div>'+icon('shield')+' <b>'+esc(session.name)+'</b> <span class="badge">مدير</span></div>'+​
-      '<div class="muted small">جلسة محمية 🔒 — بتقفل تلقائي بعد ٥ دقايق خمول <button class="btn btn-danger btn-sm" onclick="doLogout()">خروج</button></div>'+​
-    '</div>'+​
-    '<div class="tabs">'+tabs.map(function(t){ return '<button class="tabbtn '+(state.adminTab===t[0]?'on':'')+'" onclick="setAdminTab(\''+t[0]+'\')">'+t[1]+'</button>'; }).join('')+'</div>';
+  var tabsHtml=tabs.map(function(t){
+    return `<button class="tabbtn ${state.adminTab===t[0]?'on':''}" onclick="setAdminTab('${t[0]}')">${t[1]}</button>`;
+  }).join('');
   var body='';
   if(state.adminTab==='dash') body=mgrDash();
   else if(state.adminTab==='visits') body=mgrVisits();
   else if(state.adminTab==='shift') body=mgrShift();
   else body=mgrSettings();
-  app.innerHTML=head+body;
+  app.innerHTML=`<div class="nurse-head admin-head">
+    <div>${icon('shield')} <b>${esc(session.name)}</b> <span class="badge">مدير</span></div>
+    <div class="muted small">جلسة محمية 🔒 — بتقفل تلقائي بعد ٥ دقايق خمول <button class="btn btn-danger btn-sm" onclick="doLogout()">خروج</button></div>
+  </div>
+  <div class="tabs">${tabsHtml}</div>
+  ${body}`;
 }
 function setAdminTab(t){ state.adminTab=t; save(); renderPortal(); }
 function statCard(ic, val, label){
-  return '<div class="stat">'+icon(ic)+'<b>'+val+'</b><span>'+label+'</span></div>';
+  return `<div class="stat">${icon(ic)}<b>${val}</b><span>${label}</span></div>`;
 }
 function mgrDash(){
   var news=state.requests.filter(function(r){ return r.status==='new'; });
@@ -909,115 +936,124 @@ function mgrDash(){
   var revenue=done.reduce(function(a,r){ return a+r.price; },0);
   var avg=state.ratings.length?(state.ratings.reduce(function(a,b){ return a+b.stars; },0)/state.ratings.length).toFixed(1):'—';
   var onShift=state.nurses.filter(function(n){ return n.onShift; });
-  return '<div class="stat-grid">'+
-    statCard('check',news.length,'طلبات في انتظار التوزيع')+​
-    statCard('clock',active.length,'قيد التنفيذ')+​
-    statCard('check',done.length,'زيارات معمولة')+​
-    statCard('wallet',revenue+' ج','الإيراد المتحقق')+​
-    statCard('star',avg,'متوسط التقييم')+​
-    statCard('user',onShift.length+' من '+state.nurses.length,'ممرضين في الشيفت')+​
-  '</div>'+​
-  '<h3 class="sec-t">طلبات محتاجة توزيع على الشيفت</h3>'+​
-  (news.length?news.map(reqCardAdmin).join(''):'<p class="muted">مفيش طلبات في الانتظار ✔</p>')+​
-  (active.length?'<h3 class="sec-t">قيد التنفيذ ('+active.length+')</h3>'+active.map(reqCardAdmin).join(''):'');
+  var stats=[
+    statCard('check',news.length,'طلبات في انتظار التوزيع'),
+    statCard('clock',active.length,'قيد التنفيذ'),
+    statCard('check',done.length,'زيارات معمولة'),
+    statCard('wallet',revenue+' ج','الإيراد المتحقق'),
+    statCard('star',avg,'متوسط التقييم'),
+    statCard('user',onShift.length+' من '+state.nurses.length,'ممرضين في الشيفت')
+  ].join('');
+  return `<div class="stat-grid">${stats}</div>
+  <h3 class="sec-t">طلبات محتاجة توزيع على الشيفت</h3>
+  ${news.length?news.map(reqCardAdmin).join(''):'<p class="muted">مفيش طلبات في الانتظار ✔</p>'}
+  ${active.length?`<h3 class="sec-t">قيد التنفيذ (${active.length})</h3>`+active.map(reqCardAdmin).join(''):''}`;
 }
 function mgrVisits(){
   var rows=state.requests.map(function(r){
     var s=SERVICE_BY[r.service]||{name:r.service};
-    return '<tr><td>#'+r.id+'</td><td>'+esc(r.patient)+'</td><td>'+esc(r.region)+'</td><td>'+esc(s.name)+'</td><td>'+r.price+' ج</td><td><span class="badge st-'+r.status+'">'+STATUSL[r.status]+'</span></td><td>'+(r.nurse?esc(r.nurse):assignSel(r))+'</td></tr>';
+    return `<tr><td>#${r.id}</td><td>${esc(r.patient)}</td><td>${esc(r.region)}</td><td>${esc(s.name)}</td><td>${r.price} ج</td><td><span class="badge st-${r.status}">${STATUSL[r.status]}</span></td><td>${r.nurse?esc(r.nurse):assignSel(r)}</td></tr>`;
   }).join('');
   var done=state.requests.filter(function(r){ return r.status==='done'; });
   var doneRows=done.map(function(r){
     var s=SERVICE_BY[r.service]||{name:r.service};
-    return '<tr><td>#'+r.id+'</td><td>'+esc(r.patient)+'</td><td>'+esc(s.name)+'</td><td>'+esc(r.nurse||'—')+'</td><td>'+r.price+' ج</td><td>'+(r.rated?'★'.repeat(r.rated)+' ('+r.rated+'/5)':'—')+'</td><td>'+esc(r.date||'—')+'</td></tr>';
+    return `<tr><td>#${r.id}</td><td>${esc(r.patient)}</td><td>${esc(s.name)}</td><td>${esc(r.nurse||'—')}</td><td>${r.price} ج</td><td>${r.rated?'★'.repeat(r.rated)+' ('+r.rated+'/5)':'—'}</td><td>${esc(r.date||'—')}</td></tr>`;
   }).join('');
-  return '<h3 class="sec-t">كل الطلبات وحالتها</h3>'+​
-  '<div class="tbl-wrap"><table class="tbl"><thead><tr><th>الكود</th><th>العميل</th><th>المنطقة</th><th>الخدمة</th><th>السعر</th><th>الحالة</th><th>الممرض</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+​
-  '<h3 class="sec-t">الزيارات المعمولة ('+done.length+')</h3>'+​
-  (done.length?'<div class="tbl-wrap"><table class="tbl"><thead><tr><th>الكود</th><th>العميل</th><th>الخدمة</th><th>الممرض</th><th>السعر</th><th>التقييم</th><th>التاريخ</th></tr></thead><tbody>'+doneRows+'</tbody></table></div>':'<p class="muted">لسه مفيش زيارات معمولة.</p>')+​
-  '<h3 class="sec-t">آخر التقييمات</h3>'+rateListHtml();
+  return `<h3 class="sec-t">كل الطلبات وحالتها</h3>
+  <div class="tbl-wrap"><table class="tbl"><thead><tr><th>الكود</th><th>العميل</th><th>المنطقة</th><th>الخدمة</th><th>السعر</th><th>الحالة</th><th>الممرض</th></tr></thead><tbody>${rows}</tbody></table></div>
+  <h3 class="sec-t">الزيارات المعمولة (${done.length})</h3>
+  ${done.length?`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>الكود</th><th>العميل</th><th>الخدمة</th><th>الممرض</th><th>السعر</th><th>التقييم</th><th>التاريخ</th></tr></thead><tbody>${doneRows}</tbody></table></div>`:'<p class="muted">لسه مفيش زيارات معمولة.</p>'}
+  <h3 class="sec-t">آخر التقييمات</h3>
+  ${rateListHtml()}`;
 }
 function rateListHtml(){
   return state.ratings.slice(0,6).map(function(x){
-    return '<div class="req"><div class="req-top"><b>'+esc(x.nurse)+'</b><div>'+'★'.repeat(x.stars)+'☆'.repeat(5-x.stars)+'</div></div><div class="muted small">'+esc(x.comment||'—')+' · '+esc(x.when)+'</div></div>';
+    return `<div class="req"><div class="req-top"><b>${esc(x.nurse)}</b><div>${'★'.repeat(x.stars)}${'☆'.repeat(5-x.stars)}</div></div><div class="muted small">${esc(x.comment||'—')} · ${esc(x.when)}</div></div>`;
   }).join('');
 }
 function mgrShift(){
   var onShift=state.nurses.filter(function(n){ return n.onShift; });
   var cards=state.nurses.map(function(n){
-    return '<div class="req">'+
-      '<div class="req-top"><b>'+esc(n.name)+'</b>'+(n.onShift?'<span class="badge st-arrived">في الشيفت</span>':'<span class="badge st-done">خارج الشيفت</span>')+'</div>'+​
-      '<div class="req-grid">'+​
-        '<span>'+icon('pin')+' '+esc(n.region)+'</span>'+​
-        '<span>'+icon('star')+' '+n.rating+' · '+n.visits+' زيارة</span>'+​
-        '<span>'+icon('user')+' يوزر: <b class="mono">'+esc(n.username)+'</b></span>'+​
-        '<span></span>'+​
-      '</div>'+​
-      '<div class="req-actions"><button class="btn '+(n.onShift?'btn-danger':'btn-success')+' btn-sm" onclick="toggleShift('+n.id+')">'+(n.onShift?'إخراج من الشيفت':'تشغيل في الشيفت')+'</button></div>'+​
-    '</div>';
+    return `<div class="req">
+      <div class="req-top"><b>${esc(n.name)}</b>${n.onShift?'<span class="badge st-arrived">في الشيفت</span>':'<span class="badge st-done">خارج الشيفت</span>'}</div>
+      <div class="req-grid">
+        <span>${icon('pin')} ${esc(n.region)}</span>
+        <span>${icon('star')} ${n.rating} · ${n.visits} زيارة</span>
+        <span>${icon('user')} يوزر: <b class="mono">${esc(n.username)}</b></span>
+        <span></span>
+      </div>
+      <div class="req-actions"><button class="btn ${n.onShift?'btn-danger':'btn-success'} btn-sm" onclick="toggleShift(${n.id})">${n.onShift?'إخراج من الشيفت':'تشغيل في الشيفت'}</button></div>
+    </div>`;
   }).join('');
-  return '<h3 class="sec-t">مين موجود في الشيفت دلوقتي ('+onShift.length+')</h3>'+​
-  (onShift.length?'<div class="chips">'+onShift.map(function(n){ return '<span class="chip">'+esc(n.name)+' — '+esc(n.region)+'</span>'; }).join('')+'</div>':'<p class="muted">مفيش ممرض في الشيفت حاليًا!</p>')+​
-  '<h3 class="sec-t">إدارة الشيفت حسب الموقع</h3>'+cards+​
-  '<div class="alert warn small">'+icon('alert')+' التوزيع بيتم على الممرضين الموجودين في الشيفت فقط — والأولوية للمنطقة اللي نفسها منطقة العميل.</div>';
+  var chips=onShift.length?('<div class="chips">'+onShift.map(function(n){ return `<span class="chip">${esc(n.name)} — ${esc(n.region)}</span>`; }).join('')+'</div>'):'<p class="muted">مفيش ممرض في الشيفت حاليًا!</p>';
+  return `<h3 class="sec-t">مين موجود في الشيفت دلوقتي (${onShift.length})</h3>
+  ${chips}
+  <h3 class="sec-t">إدارة الشيفت حسب الموقع</h3>
+  ${cards}
+  <div class="alert warn small">${icon('alert')} التوزيع بيتم على الممرضين الموجودين في الشيفت فقط — والأولوية للمنطقة اللي نفسها منطقة العميل.</div>`;
 }
 function mgrSettings(){
   var fees=Object.keys(state.fees);
   var edit=state.editNurseId?findNurse(state.editNurseId):null;
-  var addForm='<div class="card" style="margin:12px 0">'+​
-    '<b>➕ إضافة ممرض جديد (يوزر وباسورد خاص بيه)</b>'+​
-    '<div class="grid2">'+​
-      '<div class="field"><label>الاسم</label><input id="st-name" class="inp" placeholder="اسم الممرض/ة"></div>'+​
-      '<div class="field"><label>اسم المستخدم (يوزر نيم)</label><input id="st-user" class="inp" placeholder="مثال: hoda"></div>'+​
-      '<div class="field"><label>كلمة المرور</label><div class="pw-row"><input id="st-pass" class="inp" type="password" oninput="updatePwMeter(\'st-pass\',\'st-meter\')"><button type="button" class="eye" onclick="togglePw(\'st-pass\',this)">👁</button></div><div id="st-meter"></div></div>'+​
-      '<div class="field"><label>المنطقة</label><select id="st-region" class="inp">'+fees.map(function(r){ return '<option>'+r+'</option>'; }).join('')+'</select></div>'+​
-    '</div>'+​
-    '<button class="btn btn-success" onclick="addNurseAcc()">إنشاء الحساب</button>'+​
-    '<p class="muted small">كلمة المرور: ٨ حروف على الأقل وفيها حروف وأرقام. الحساب بيتعمل خارج الشيفت — شغّله من تاب «الشيفت».</p>'+​
-  '</div>';
+  var feeOpts=fees.map(function(r){ return `<option>${r}</option>`; }).join('');
+  var addForm=`<div class="card" style="margin:12px 0">
+    <b>➕ إضافة ممرض جديد (يوزر وباسورد خاص بيه)</b>
+    <div class="grid2">
+      <div class="field"><label>الاسم</label><input id="st-name" class="inp" placeholder="اسم الممرض/ة"></div>
+      <div class="field"><label>اسم المستخدم (يوزر نيم)</label><input id="st-user" class="inp" placeholder="مثال: hoda"></div>
+      <div class="field"><label>كلمة المرور</label><div class="pw-row"><input id="st-pass" class="inp" type="password" oninput="updatePwMeter('st-pass','st-meter')"><button type="button" class="eye" onclick="togglePw('st-pass',this)">👁</button></div><div id="st-meter"></div></div>
+      <div class="field"><label>المنطقة</label><select id="st-region" class="inp">${feeOpts}</select></div>
+    </div>
+    <button class="btn btn-success" onclick="addNurseAcc()">إنشاء الحساب</button>
+    <p class="muted small">كلمة المرور: ٨ حروف على الأقل وفيها حروف وأرقام. الحساب بيتعمل خارج الشيفت — شغّله من تاب «الشيفت».</p>
+  </div>`;
   var rows=state.nurses.map(function(n){
-    return '<tr><td>'+esc(n.name)+'</td><td><b class="mono">'+esc(n.username)+'</b></td><td>'+esc(n.region)+'</td><td>'+(n.onShift?'<span class="badge st-arrived">في الشيفت</span>':'<span class="badge st-done">خارج</span>')+'</td><td>'+n.rating+' '+icon('star')+'</td><td>'+n.visits+'</td><td><button class="btn btn-ghost btn-sm" onclick="editNurse('+n.id+')">تعديل</button> <button class="btn btn-danger btn-sm" onclick="deleteNurse('+n.id+')">حذف</button></td></tr>';
+    return `<tr><td>${esc(n.name)}</td><td><b class="mono">${esc(n.username)}</b></td><td>${esc(n.region)}</td><td>${n.onShift?'<span class="badge st-arrived">في الشيفت</span>':'<span class="badge st-done">خارج</span>'}</td><td>${n.rating} ${icon('star')}</td><td>${n.visits}</td><td><button class="btn btn-ghost btn-sm" onclick="editNurse(${n.id})">تعديل</button> <button class="btn btn-danger btn-sm" onclick="deleteNurse(${n.id})">حذف</button></td></tr>`;
   }).join('');
-  var editor=edit?(
-    '<div class="card" style="border-color:var(--blue);margin:12px 0">'+​
-      '<b>✏️ تعديل حساب: '+esc(edit.name)+'</b>'+​
-      '<div class="grid2">'+​
-        '<div class="field"><label>الاسم</label><input id="ed-name" class="inp" value="'+esc(edit.name)+'"></div>'+​
-        '<div class="field"><label>اليوزر نيم</label><input id="ed-user" class="inp" value="'+esc(edit.username)+'"></div>'+​
-        '<div class="field"><label>المنطقة</label><select id="ed-region" class="inp">'+fees.map(function(r){ return '<option '+(edit.region===r?'selected':'')+'>'+r+'</option>'; }).join('')+'</select></div>'+​
-        '<div class="field"><label>كلمة مرور جديدة (اختياري)</label><div class="pw-row"><input id="ed-pass" class="inp" type="password" placeholder="سيبها فاضية لو مش هتغير"><button type="button" class="eye" onclick="togglePw(\'ed-pass\',this)">👁</button></div></div>'+​
-      '</div>'+​
-      '<div class="inline-form"><button class="btn btn-success" onclick="saveNurseEdit()">حفظ التعديلات</button><button class="btn btn-ghost" onclick="cancelEdit()">إلغاء</button></div>'+​
-    '</div>'
-  ):'';
+  var editor='';
+  if(edit){
+    var editRegionOpts=fees.map(function(r){ return `<option ${edit.region===r?'selected':''}>${r}</option>`; }).join('');
+    editor=`<div class="card" style="border-color:var(--blue);margin:12px 0">
+      <b>✏️ تعديل حساب: ${esc(edit.name)}</b>
+      <div class="grid2">
+        <div class="field"><label>الاسم</label><input id="ed-name" class="inp" value="${esc(edit.name)}"></div>
+        <div class="field"><label>اليوزر نيم</label><input id="ed-user" class="inp" value="${esc(edit.username)}"></div>
+        <div class="field"><label>المنطقة</label><select id="ed-region" class="inp">${editRegionOpts}</select></div>
+        <div class="field"><label>كلمة مرور جديدة (اختياري)</label><div class="pw-row"><input id="ed-pass" class="inp" type="password" placeholder="سيبها فاضية لو مش هتغير"><button type="button" class="eye" onclick="togglePw('ed-pass',this)">👁</button></div></div>
+      </div>
+      <div class="inline-form"><button class="btn btn-success" onclick="saveNurseEdit()">حفظ التعديلات</button><button class="btn btn-ghost" onclick="cancelEdit()">إلغاء</button></div>
+    </div>`;
+  }
   var priceRows=SERVICES.map(function(s){
     var c=state.prices[s.id];
-    return '<tr><td><b>'+s.name+'</b></td><td><input class="inp sm" type="number" id="p-'+s.id+'" value="'+c.price+'"></td><td><input class="inp sm" type="number" id="d-'+s.id+'" value="'+c.dur+'"></td><td><input class="inp sm" type="number" id="x-'+s.id+'" value="'+c.extra+'"></td></tr>';
+    return `<tr><td><b>${s.name}</b></td><td><input class="inp sm" type="number" id="p-${s.id}" value="${c.price}"></td><td><input class="inp sm" type="number" id="d-${s.id}" value="${c.dur}"></td><td><input class="inp sm" type="number" id="x-${s.id}" value="${c.extra}"></td></tr>`;
   }).join('');
   var chips=state.allowed.map(function(a,i){
-    return '<span class="chip">'+esc(a)+' <button onclick="removeAllowed('+i+')" title="إزالة">×</button></span>';
+    return `<span class="chip">${esc(a)} <button onclick="removeAllowed(${i})" title="إزالة">×</button></span>`;
   }).join('');
-  return '<h3 class="sec-t">إعدادات الحسابات — المدير يضيف ويعدّل الممرضين من هنا</h3>'+addForm+editor+​
-  '<div class="tbl-wrap"><table class="tbl"><thead><tr><th>الاسم</th><th>اليوزر</th><th>المنطقة</th><th>الشيفت</th><th>التقييم</th><th>الزيارات</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div>'+​
-  '<h3 class="sec-t">أمان حساب المدير</h3>'+​
-  '<div class="card" style="margin:12px 0">'+​
-    '<b>🔑 تغيير كلمة مرور المدير</b>'+​
-    '<div class="grid2">'+​
-      '<div class="field"><label>الحالية</label><input id="ad-old" class="inp" type="password"></div>'+​
-      '<div class="field"><label>الجديدة</label><div class="pw-row"><input id="ad-new" class="inp" type="password" oninput="updatePwMeter(\'ad-new\',\'ad-meter\')"><button type="button" class="eye" onclick="togglePw(\'ad-new\',this)">👁</button></div><div id="ad-meter"></div></div>'+​
-      '<div class="field"><label>تأكيد الجديدة</label><input id="ad-new2" class="inp" type="password"></div>'+​
-    '</div>'+​
-    '<button class="btn btn-primary" onclick="changeAdminPass()">تحديث كلمة مرور المدير</button>'+​
-  '</div>'+​
-  '<h3 class="sec-t">إدارة الأسعار والخدمات</h3>'+​
-  '<div class="tbl-wrap"><table class="tbl"><thead><tr><th>الخدمة</th><th>السعر الأساسي (ج)</th><th>المدة الأساسية (د)</th><th>سعر الزيادة (ج)</th></tr></thead><tbody>'+priceRows+'</tbody></table></div>'+​
-  '<div class="inline-form"><button class="btn btn-success" onclick="savePrices()">حفظ الأسعار</button><button class="btn btn-ghost btn-sm" onclick="resetDemo()">↺ إعادة ضبط البيانات التجريبية</button></div>'+​
-  '<h3 class="sec-t">قائمة الحقن المسموحة</h3>'+​
-  '<div class="chips">'+chips+'</div>'+​
-  '<div class="card inline-form"><input id="a-add" class="inp" placeholder="اسم حقنة جديدة…"><button class="btn btn-primary" onclick="addAllowed()">إضافة بعد مراجعة</button></div>'+​
-  '<div class="alert bad">'+icon('alert')+' القائمة المنوعة: كل المضادات الحيوية بكل أنواعها + أي حقنة مش في القائمة المسموحة.</div>'+​
-  '<h3 class="sec-t">تقارير: عدد الطلبات والإيراد حسب المنطقة</h3>'+​
-  regionBars();
+  return `<h3 class="sec-t">إعدادات الحسابات — المدير يضيف ويعدّل الممرضين من هنا</h3>
+  ${addForm}
+  ${editor}
+  <div class="tbl-wrap"><table class="tbl"><thead><tr><th>الاسم</th><th>اليوزر</th><th>المنطقة</th><th>الشيفت</th><th>التقييم</th><th>الزيارات</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
+  <h3 class="sec-t">أمان حساب المدير</h3>
+  <div class="card" style="margin:12px 0">
+    <b>🔑 تغيير كلمة مرور المدير</b>
+    <div class="grid2">
+      <div class="field"><label>الحالية</label><input id="ad-old" class="inp" type="password"></div>
+      <div class="field"><label>الجديدة</label><div class="pw-row"><input id="ad-new" class="inp" type="password" oninput="updatePwMeter('ad-new','ad-meter')"><button type="button" class="eye" onclick="togglePw('ad-new',this)">👁</button></div><div id="ad-meter"></div></div>
+      <div class="field"><label>تأكيد الجديدة</label><input id="ad-new2" class="inp" type="password"></div>
+    </div>
+    <button class="btn btn-primary" onclick="changeAdminPass()">تحديث كلمة مرور المدير</button>
+  </div>
+  <h3 class="sec-t">إدارة الأسعار والخدمات</h3>
+  <div class="tbl-wrap"><table class="tbl"><thead><tr><th>الخدمة</th><th>السعر الأساسي (ج)</th><th>المدة الأساسية (د)</th><th>سعر الزيادة (ج)</th></tr></thead><tbody>${priceRows}</tbody></table></div>
+  <div class="inline-form"><button class="btn btn-success" onclick="savePrices()">حفظ الأسعار</button><button class="btn btn-ghost btn-sm" onclick="resetDemo()">↺ إعادة ضبط البيانات التجريبية</button></div>
+  <h3 class="sec-t">قائمة الحقن المسموحة</h3>
+  <div class="chips">${chips}</div>
+  <div class="card inline-form"><input id="a-add" class="inp" placeholder="اسم حقنة جديدة…"><button class="btn btn-primary" onclick="addAllowed()">إضافة بعد مراجعة</button></div>
+  <div class="alert bad">${icon('alert')} القائمة المنوعة: كل المضادات الحيوية بكل أنواعها + أي حقنة مش في القائمة المسموحة.</div>
+  <h3 class="sec-t">تقارير: عدد الطلبات والإيراد حسب المنطقة</h3>
+  ${regionBars()}`;
 }
 function assignSel(r){
   var onShift=state.nurses.filter(function(n){ return n.onShift; });
@@ -1028,9 +1064,9 @@ function assignSel(r){
     return ar-br;
   });
   var opts=sorted.map(function(n){
-    return '<option value="'+n.id+'">'+esc(n.name)+(n.region===r.region?' — ✅ نفس المنطقة':' — '+esc(n.region))+'</option>';
+    return `<option value="${n.id}">${esc(n.name)}${n.region===r.region?' — ✅ نفس المنطقة':' — '+esc(n.region)}</option>`;
   }).join('');
-  return '<select class="inp sm" onchange="assignReq('+r.id+', this.value)"><option value="">أسند حسب الموقع…</option>'+opts+'</select>';
+  return `<select class="inp sm" onchange="assignReq(${r.id}, this.value)"><option value="">أسند حسب الموقع…</option>${opts}</select>`;
 }
 function assignReq(id, nidStr){
   var nid=parseInt(nidStr,10);
@@ -1131,9 +1167,10 @@ function regionBars(){
   });
   var max=1;
   Object.keys(map).forEach(function(k){ if(map[k].v>max) max=map[k].v; });
-  return '<div class="bars">'+Object.keys(map).map(function(k){
-    return '<div class="bar-row"><span class="bar-label">'+esc(k)+'</span><div class="bar-track"><div class="bar-fill" style="width:'+Math.round(map[k].v/max*100)+'%"></div></div><span class="bar-val">'+map[k].c+' طلب · '+map[k].v+' ج</span></div>';
-  }).join('')+'</div>';
+  var bars=Object.keys(map).map(function(k){
+    return `<div class="bar-row"><span class="bar-label">${esc(k)}</span><div class="bar-track"><div class="bar-fill" style="width:${Math.round(map[k].v/max*100)}%"></div></div><span class="bar-val">${map[k].c} طلب · ${map[k].v} ج</span></div>`;
+  }).join('');
+  return `<div class="bars">${bars}</div>`;
 }
 function updatePwMeter(inputId, meterId){
   var p=($('#'+inputId)||{}).value||'';
@@ -1155,41 +1192,44 @@ function renderNursePortal(){
   var me=findNurse(session.id);
   if(!me){ setSession(null); renderPortal(); return; }
   var tabs=[['visits','🩺 زياراتي'],['log','📒 السجل'],['profile','⚙️ إعدادي']];
+  var tabsHtml=tabs.map(function(t){
+    return `<button class="tabbtn ${state.nurseTab===t[0]?'on':''}" onclick="setNurseTab('${t[0]}')">${t[1]}</button>`;
+  }).join('');
   var mine=state.requests.filter(function(r){ return r.nurseId===me.id; });
   var assigned=mine.filter(function(r){ return r.status==='assigned'; });
   var active=mine.filter(function(r){ return r.status==='accepted'||r.status==='onway'||r.status==='arrived'; });
   var done=mine.filter(function(r){ return r.status==='done'; });
-  var head='<div class="nurse-head admin-head">'+​
-    '<div>'+icon('user')+' <b>'+esc(me.name)+'</b> <span class="badge">'+esc(me.region)+'</span> '+(me.onShift?'<span class="badge st-arrived">في الشيفت</span>':'<span class="badge st-done">خارج الشيفت</span>')+'</div>'+​
-    '<div class="muted small">'+icon('star')+' '+me.rating+' · '+me.visits+' زيارة · جلسة محمية 🔒 <button class="btn btn-danger btn-sm" onclick="doLogout()">خروج</button></div>'+​
-  '</div>'+​
-  '<div class="tabs">'+tabs.map(function(t){ return '<button class="tabbtn '+(state.nurseTab===t[0]?'on':'')+'" onclick="setNurseTab(\''+t[0]+'\')">'+t[1]+'</button>'; }).join('')+'</div>';
   var body='';
   if(state.nurseTab==='visits'){
-    body='<h3 class="sec-t">طلبات مُسندة ليك — في انتظار قبولك ('+assigned.length+')</h3>'+​
-      (assigned.length?assigned.map(reqCard).join(''):'<p class="muted">مفيش طلبات جديدة مُسندة ليك.</p>')+​
-      '<h3 class="sec-t">طلباتك النشطة ('+active.length+')</h3>'+​
-      (active.length?active.map(reqCard).join(''):'<p class="muted">مفيش طلبات نشطة.</p>');
+    body=`<h3 class="sec-t">طلبات مُسندة ليك — في انتظار قبولك (${assigned.length})</h3>
+    ${assigned.length?assigned.map(reqCard).join(''):'<p class="muted">مفيش طلبات جديدة مُسندة ليك.</p>'}
+    <h3 class="sec-t">طلباتك النشطة (${active.length})</h3>
+    ${active.length?active.map(reqCard).join(''):'<p class="muted">مفيش طلبات نشطة.</p>'}`;
   } else if(state.nurseTab==='log'){
-    body='<h3 class="sec-t">سجل زياراتك والتقييمات</h3>'+​
-      (done.length?done.map(function(r){
-        var s=SERVICE_BY[r.service]||{name:r.service};
-        return '<div class="req done"><div class="req-top"><b>#'+r.id+' — '+esc(r.patient)+' · '+esc(s.name)+'</b><div>'+(r.rated?icon('star')+' '+r.rated+'/5':'<span class="muted small">لسه متقيّمش</span>')+'</div></div><div class="muted small">'+esc(r.address)+' · '+r.price+' ج · '+esc(r.date||'')+'</div></div>';
-      }).join(''):'<p class="muted">لسه مفيش زيارات مكتملة.</p>');
+    body=`<h3 class="sec-t">سجل زياراتك والتقييمات</h3>
+    ${done.length?done.map(function(r){
+      var s=SERVICE_BY[r.service]||{name:r.service};
+      return `<div class="req done"><div class="req-top"><b>#${r.id} — ${esc(r.patient)} · ${esc(s.name)}</b><div>${r.rated?icon('star')+' '+r.rated+'/5':'<span class="muted small">لسه متقيّمش</span>'}</div></div><div class="muted small">${esc(r.address)} · ${r.price} ج · ${esc(r.date||'')}</div></div>`;
+    }).join(''):'<p class="muted">لسه مفيش زيارات مكتملة.</p>'}`;
   } else {
-    body='<h3 class="sec-t">تغيير الاسم</h3>'+​
-      '<div class="card inline-form"><input id="np-name" class="inp" value="'+esc(me.name)+'"><button class="btn btn-primary" onclick="saveNurseName()">حفظ الاسم</button></div>'+​
-      '<h3 class="sec-t">تغيير كلمة المرور</h3>'+​
-      '<div class="card">'+​
-        '<div class="field"><label>كلمة المرور الحالية</label><div class="pw-row"><input id="np-old" class="inp" type="password"><button type="button" class="eye" onclick="togglePw(\'np-old\',this)">👁</button></div></div>'+​
-        '<div class="field"><label>كلمة المرور الجديدة</label><div class="pw-row"><input id="np-new" class="inp" type="password" oninput="updatePwMeter(\'np-new\',\'np-meter\')"><button type="button" class="eye" onclick="togglePw(\'np-new\',this)">👁</button></div><div id="np-meter"></div></div>'+​
-        '<div class="field"><label>تأكيد كلمة المرور الجديدة</label><input id="np-new2" class="inp" type="password"></div>'+​
-        '<button class="btn btn-success" onclick="changeNursePass()">تحديث كلمة المرور</button>'+​
-        '<p class="muted small">٨ حروف على الأقل وفيها حروف وأرقام.</p>'+​
-      '</div>'+​
-      '<div class="alert ok">'+icon('shield')+' حسابك محمي بيوزر <b class="mono">'+esc(me.username)+'</b> وكلمة مرور مشفّرة — مفيش حد يقدر يفتحه غيرك.</div>';
+    body=`<h3 class="sec-t">تغيير الاسم</h3>
+    <div class="card inline-form"><input id="np-name" class="inp" value="${esc(me.name)}"><button class="btn btn-primary" onclick="saveNurseName()">حفظ الاسم</button></div>
+    <h3 class="sec-t">تغيير كلمة المرور</h3>
+    <div class="card">
+      <div class="field"><label>كلمة المرور الحالية</label><div class="pw-row"><input id="np-old" class="inp" type="password"><button type="button" class="eye" onclick="togglePw('np-old',this)">👁</button></div></div>
+      <div class="field"><label>كلمة المرور الجديدة</label><div class="pw-row"><input id="np-new" class="inp" type="password" oninput="updatePwMeter('np-new','np-meter')"><button type="button" class="eye" onclick="togglePw('np-new',this)">👁</button></div><div id="np-meter"></div></div>
+      <div class="field"><label>تأكيد كلمة المرور الجديدة</label><input id="np-new2" class="inp" type="password"></div>
+      <button class="btn btn-success" onclick="changeNursePass()">تحديث كلمة المرور</button>
+      <p class="muted small">٨ حروف على الأقل وفيها حروف وأرقام.</p>
+    </div>
+    <div class="alert ok">${icon('shield')} حسابك محمي بيوزر <b class="mono">${esc(me.username)}</b> وكلمة مرور مشفّرة — مفيش حد يقدر يفتحه غيرك.</div>`;
   }
-  app.innerHTML=head+body;
+  app.innerHTML=`<div class="nurse-head admin-head">
+    <div>${icon('user')} <b>${esc(me.name)}</b> <span class="badge">${esc(me.region)}</span> ${me.onShift?'<span class="badge st-arrived">في الشيفت</span>':'<span class="badge st-done">خارج الشيفت</span>'}</div>
+    <div class="muted small">${icon('star')} ${me.rating} · ${me.visits} زيارة · جلسة محمية 🔒 <button class="btn btn-danger btn-sm" onclick="doLogout()">خروج</button></div>
+  </div>
+  <div class="tabs">${tabsHtml}</div>
+  ${body}`;
 }
 function setNurseTab(t){ state.nurseTab=t; save(); renderPortal(); }
 function findNurse(id){
@@ -1201,17 +1241,17 @@ function reqCard(r){
   var actions='';
   if(r.status==='assigned') actions+='<button class="btn btn-success" onclick="acceptReq('+r.id+')">قبول الطلب ✔</button>';
   else if(NEXT[r.status]) actions+='<button class="btn btn-primary" onclick="nurseAdvance('+r.id+')">'+NEXTL[NEXT[r.status]]+' ←</button>';
-  return '<div class="req">'+
-    '<div class="req-top"><b>#'+r.id+' — '+esc(r.patient)+'</b><span class="badge st-'+r.status+'">'+STATUSL[r.status]+'</span></div>'+​
-    '<div class="req-grid">'+​
-      '<span>'+icon('pin')+' '+esc(r.region)+' — '+esc(r.address)+'</span>'+​
-      '<span>'+icon('clock')+' '+r.dur+' دقيقة · '+esc(r.date||'اليوم')+' '+esc(r.time||'')+'</span>'+​
-      '<span>'+icon('check')+' '+esc(s.name)+' — '+esc(r.detail||'')+'</span>'+​
-      '<span>'+icon('wallet')+' '+r.price+' ج · '+esc(r.payment||'')+'</span>'+​
-    '</div>'+​
-    (r.note?'<div class="alert warn small" style="margin-top:0">📝 ملحوظة العميل: '+esc(r.note)+'</div>':'')+​
-    '<div class="req-actions">'+actions+'</div>'+​
-  '</div>';
+  return `<div class="req">
+    <div class="req-top"><b>#${r.id} — ${esc(r.patient)}</b><span class="badge st-${r.status}">${STATUSL[r.status]}</span></div>
+    <div class="req-grid">
+      <span>${icon('pin')} ${esc(r.region)} — ${esc(r.address)}</span>
+      <span>${icon('clock')} ${r.dur} دقيقة · ${esc(r.date||'اليوم')} ${esc(r.time||'')}</span>
+      <span>${icon('check')} ${esc(s.name)} — ${esc(r.detail||'')}</span>
+      <span>${icon('wallet')} ${r.price} ج · ${esc(r.payment||'')}</span>
+    </div>
+    ${r.note?`<div class="alert warn small" style="margin-top:0">📝 ملحوظة العميل: ${esc(r.note)}</div>`:''}
+    <div class="req-actions">${actions}</div>
+  </div>`;
 }
 function acceptReq(id){
   var r=findReq(id);
@@ -1253,22 +1293,21 @@ function renderHomeServices(){
   var el=$('#home-services-grid'); if(!el) return;
   el.innerHTML=SERVICES.map(function(s){
     var c=state.prices[s.id];
-    return '<button class="svc-card" onclick="startBooking()">'+
-      icon(s.icon,'svc-ic')+
-      '<b>'+s.name+'</b>'+
-      '<span class="muted small">'+s.desc+'</span>'+
-      '<span class="svc-meta">'+icon('clock')+' '+c.dur+' دقيقة · '+c.price+' ج</span>'+
-    '</button>';
+    return `<button class="svc-card" onclick="startBooking()">
+      ${icon(s.icon,'svc-ic')}
+      <b>${s.name}</b>
+      <span class="muted small">${s.desc}</span>
+      <span class="svc-meta">${icon('clock')} ${c.dur} دقيقة · ${c.price} ج</span>
+    </button>`;
   }).join('');
 }
 function renderPricing(){
   var el=$('#home-prices-body'); if(!el) return;
-  el.innerHTML='<div class="tbl-wrap"><table class="tbl"><thead><tr><th>الخدمة</th><th>المدة الأساسية</th><th>السعر المقترح (جنيه)</th></tr></thead><tbody>'+​
-    SERVICES.map(function(s){
-      var c=state.prices[s.id];
-      return '<tr><td><b>'+s.name+'</b><div class="muted small">'+s.desc+'</div></td><td>'+c.dur+' دقيقة</td><td><b>'+c.price+'</b></td></tr>';
-    }).join('')+​
-  '</tbody></table></div>';
+  var rows=SERVICES.map(function(s){
+    var c=state.prices[s.id];
+    return `<tr><td><b>${s.name}</b><div class="muted small">${s.desc}</div></td><td>${c.dur} دقيقة</td><td><b>${c.price}</b></td></tr>`;
+  }).join('');
+  el.innerHTML=`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>الخدمة</th><th>المدة الأساسية</th><th>السعر المقترح (جنيه)</th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 function startBooking(){
   booking=freshBooking();
